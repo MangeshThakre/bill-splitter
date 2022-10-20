@@ -4,7 +4,6 @@ const authcontroller = require("../controller/auth.js");
 require("../pasport.js");
 
 router.get("/login/success", (req, res) => {
-  console.log(req.user);
   if (req.isAuthenticated()) {
     res.status(200).json({
       error: false,
@@ -40,7 +39,19 @@ router.get("/google", passport.authenticate("google", ["profile", "email"]));
 
 router.get(
   "/google/callback",
-  passport.authenticate("google"),
+  passport.authenticate(
+    "google",
+    {
+      failureRedirect: "/login",
+      successRedirect: "http://localhost:3000",
+    }
+    // (req, res, next) => {
+    //   // console.log(req.user);
+    //   // console.log(req.session);
+    //   next();
+    // }
+  ),
+
   authcontroller.singIn
 );
 

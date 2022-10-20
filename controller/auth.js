@@ -4,14 +4,15 @@ const { genPassword } = require("../lib/passportLib.js");
 
 class AuthController {
   static singIn(req, res) {
-    if (req.user) {
+    if (!req.user.error) {
       res.status(200).json({
         error: false,
         message: "Successfully Loged In",
-        user: req.user,
+        // user: req.user,
       });
     } else {
-      res.status(403).json({ error: true, message: "Not Authorized" });
+      console.log(req.message);
+      res.status(200).json(req.user);
     }
   }
 
