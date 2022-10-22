@@ -15,28 +15,42 @@ const customfield = {
   passwordField: "password",
   passReqToCallback: true,
 };
+
+// done is a callback which take three arguments err, user, info
+// like done(err, user, info)
+// passport.authenticated("local" , callback(err, user, info))
+// by default if user is false then passport set  message = "unauthorised"
+// for the custom messages i pass error message in user argument :)
+
 const verifyLocalStrategy = async function (req, email, password, done) {
   try {
-    const user = await userModel.findOne({
-      email,
-      // phoneNo: req.body.phoneNo,
-    });
+    const user = await userModel.findOne({ email });
+
+    // if user does not exist show warning
     if (!user) {
-      console.log("not found");
       return done(null, {
         error: true,
         message: `That e-mail address doesn't have an associated user account.
            Are you sure you've registered?`,
       });
+
+      // if user first time login with social and did not generate password and try to log in with email+password
+      // show alert to login with social
+    } else if (user && !user.hash && !user.salt) {
+      return done(null, {
+        error: true,
+        message: "password does not exist please try to login with social",
+      });
     }
+
     const isValid = validPassword(user.hash, user.salt, password);
     if (isValid) {
       return done(null, user);
     } else {
-      return done(null, { error: true, message: "Invalid  password." });
+      return done({ message: "Invalid  password." });
     }
   } catch (error) {
-    done(null, false, { message: err });
+    done(null, false, { message: error.message });
   }
 };
 

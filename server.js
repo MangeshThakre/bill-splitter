@@ -43,13 +43,14 @@ app.use(
     name: "Bill-spliter-session",
     secret: process.env.SECRET,
     store: store,
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 24 * 60 * 60, // 24 hours in miliseconnds
     },
   })
 );
+
 require("./pasport.js");
 app.use(passport.initialize());
 app.use(passport.session());
@@ -62,7 +63,6 @@ app.use(passport.session());
 
 //  router
 app.use("/auth", authRoute);
-
 app.use((err, req, res, dome) => {
   if (err) console.log("server.js", err);
 });

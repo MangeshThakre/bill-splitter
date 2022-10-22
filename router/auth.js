@@ -15,20 +15,12 @@ router.get("/login/success", (req, res) => {
   }
 });
 
-router.get("/login/failed", (req, res) => {
-  res.status(401).json({
-    error: true,
-    message: "Log in failure",
-  });
-});
-
 router.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect(process.env.CLIENT_URL);
+  req.session.destroy();
+  res.json({ error: false, message: "successfuly logout" });
 });
 
 ///////////////////////////////////////////////////
-
 // SIGN-IN
 
 // local-statergy
@@ -39,18 +31,10 @@ router.get("/google", passport.authenticate("google", ["profile", "email"]));
 
 router.get(
   "/google/callback",
-  passport.authenticate(
-    "google",
-    {
-      failureRedirect: "/login",
-      successRedirect: "http://localhost:3000",
-    }
-    // (req, res, next) => {
-    //   // console.log(req.user);
-    //   // console.log(req.session);
-    //   next();
-    // }
-  ),
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    successRedirect: "http://localhost:3000",
+  }),
 
   authcontroller.singIn
 );
