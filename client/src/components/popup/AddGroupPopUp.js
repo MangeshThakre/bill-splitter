@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useState, useRef } from "react";
 // img
 import persionImg from "../../asset/persion.png";
 import groupImg from "../../asset/group.png";
@@ -9,9 +10,100 @@ import corssIcon from "../../asset/cross.png";
 import { user } from "../../redux/globalSplice";
 
 function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
+  const groupListEle = useRef("");
+  const allFriends = [
+    { name: "test 1", email: "textone@gmail.com" },
+    { name: "test 2", email: "texttwo@gmail.com" },
+    { name: "test 3", email: "textthree@gmail.com" },
+    { name: "test 4", email: "" },
+    { name: "test 5", email: "textfive@gmail.com" },
+    { name: "test 6", email: "textsix@gmail.com" },
+    { name: "test 7", email: "textseven@gmail.com" },
+    { name: "test 8", email: "" },
+  ];
   const USER = useSelector((state) => state.global.user);
+  const [groupMember, setGroupMamber] = useState([]);
+
+  function handleAddGroupMember() {
+    const groupMembersEleArr = groupListEle.current.children;
+    const memberNo = groupMembersEleArr.length + 1;
+    const li = document.createElement("li");
+    li.className = "flex gap-3 items-center mt-4";
+    li.id = `${memberNo}_groupMember`;
+    li.innerHTML = newMemberEle(persionImg, memberNo);
+    groupListEle.current.appendChild(li);
+  }
 
   async function handleAddGroup() {}
+
+  function handleDropdownMemberName(e) {
+    // target dropdown useing current element  and removeing all teh child element
+    const dorpdownEle = e.target.parentElement.lastElementChild;
+    dorpdownEle.firstElementChild.innerHTML = "";
+
+    // find the friend Name for dropdown base on current inpute value
+    const filteredName = allFriends.filter(({ name, email }) =>
+      name.includes(e.target.value)
+    );
+
+    //  if current inpute value not matches any firend name form freind list then hide teh dropdown and return
+    if (filteredName.length < 1 || e.target.value == "") {
+      return (dorpdownEle.className = "hidden");
+    }
+
+    // loop throuch the matched friend list arr[] and add in dropdown
+    filteredName.forEach((e, id) => {
+      const li = document.createElement("li");
+      li.innerHTML = dropdownMemberNameEle(e.name, id);
+      dorpdownEle.firstElementChild.appendChild(li);
+    });
+
+    // display the dropdown of friends name who matches the input value
+    dorpdownEle.className =
+      "absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll  h-36";
+    // diefault className of dropdownEle  is "hidden absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700"
+    // remove the hidden from className to display teh dropdown
+  }
+
+  function dropdownMemberNameEle(name, id) {
+    return `<li id =${id}>
+              <p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                ${name}
+              </p>
+          </li>`;
+  }
+
+  function newMemberEle(img, memberNo) {
+    return `
+    <img
+      src=${img}
+      class="w-10 h-10 rounded-full"
+      alt="freind"
+    />
+    <input
+      type="text"
+      id="name"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      placeholder="name"
+      required
+      name = ${memberNo + "_name"}
+    />
+    <input
+      type="text"
+      id="email"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      placeholder="email@.com"
+      name =${memberNo + "_email"}
+    />
+    <button
+      type="button"
+      onclick="this.parentElement.remove()"
+      class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
+    >
+      x
+    </button>
+  `;
+  }
 
   return (
     <>
@@ -60,7 +152,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                     >
                       <div class="flex flex-col justify-center items-center pt-5 px-2 pb-6">
                         <svg
-                          aria-hidden="true"
+                          ariaHidden="true"
                           class="mb-3 w-10 h-10 text-gray-400"
                           fill="none"
                           stroke="currentColor"
@@ -68,8 +160,8 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             stroke-width="2"
                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                           ></path>
@@ -115,7 +207,8 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                         Group Members
                       </h1>
 
-                      <ul>
+                      <ul ref={groupListEle}>
+                        {/*  */}
                         <li className="flex gap-3 items-center mt-4">
                           <img
                             src={USER.profilePhoto}
@@ -127,163 +220,54 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                           </p>
                           <p>( {USER.email} )</p>
                         </li>
+
                         <li className="flex gap-3 items-center mt-4">
                           <img
                             src={persionImg}
                             className="w-10 h-10 rounded-full"
                             alt="freind"
                           />
-                          <input
-                            type="text"
-                            id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name"
-                            required
-                          />
-                          <input
-                            type="text"
-                            id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Email@.com"
-                            required
-                          />
-                          <button
-                            type="button"
-                            class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
-                          >
-                            x
-                          </button>
-                        </li>
-                        <li className="flex gap-3 items-center mt-4">
-                          <img
-                            src={persionImg}
-                            className="w-10 h-10 rounded-full"
-                            alt="freind"
-                          />
-                          <input
-                            type="text"
-                            id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name"
-                            required
-                          />
+                          <span className="relative w-full">
+                            <input
+                              type="text"
+                              id="name"
+                              class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              placeholder="name"
+                              required
+                              onChange={(e) => handleDropdownMemberName(e)}
+                            />
+                            <div
+                              id="dropdown"
+                              class="hidden absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll  h-36"
+                            >
+                              <ul
+                                class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                                aria-labelledby="dropdownDefault"
+                              >
+                                <li>
+                                  <p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    Dashboard
+                                  </p>
+                                </li>
+                                <li>
+                                  <p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    Settings
+                                  </p>
+                                </li>
+                              </ul>
+                            </div>
+                          </span>
+
                           <input
                             type="text"
                             id="email"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Email@.com"
+                            placeholder="email@.com"
                             required
                           />
                           <button
                             type="button"
-                            class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
-                          >
-                            x
-                          </button>
-                        </li>{" "}
-                        <li className="flex gap-3 items-center mt-4">
-                          <img
-                            src={persionImg}
-                            className="w-10 h-10 rounded-full"
-                            alt="freind"
-                          />
-                          <input
-                            type="text"
-                            id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name"
-                            required
-                          />
-                          <input
-                            type="text"
-                            id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Email@.com"
-                            required
-                          />
-                          <button
-                            type="button"
-                            class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
-                          >
-                            x
-                          </button>
-                        </li>{" "}
-                        <li className="flex gap-3 items-center mt-4">
-                          <img
-                            src={persionImg}
-                            className="w-10 h-10 rounded-full"
-                            alt="freind"
-                          />
-                          <input
-                            type="text"
-                            id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name"
-                            required
-                          />
-                          <input
-                            type="text"
-                            id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Email@.com"
-                            required
-                          />
-                          <button
-                            type="button"
-                            class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
-                          >
-                            x
-                          </button>
-                        </li>{" "}
-                        <li className="flex gap-3 items-center mt-4">
-                          <img
-                            src={persionImg}
-                            className="w-10 h-10 rounded-full"
-                            alt="freind"
-                          />
-                          <input
-                            type="text"
-                            id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name"
-                            required
-                          />
-                          <input
-                            type="text"
-                            id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Email@.com"
-                            required
-                          />
-                          <button
-                            type="button"
-                            class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
-                          >
-                            x
-                          </button>
-                        </li>{" "}
-                        <li className="flex gap-3 items-center mt-4">
-                          <img
-                            src={persionImg}
-                            className="w-10 h-10 rounded-full"
-                            alt="freind"
-                          />
-                          <input
-                            type="text"
-                            id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name"
-                            required
-                          />
-                          <input
-                            type="text"
-                            id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Email@.com"
-                            required
-                          />
-                          <button
-                            type="button"
+                            onClick={(e) => e.target.parentElement.remove()}
                             class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
                           >
                             x
@@ -292,6 +276,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                       </ul>
                       <div
                         id="addPersion"
+                        onClick={() => handleAddGroupMember()}
                         className="my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                       >
                         + Add a persion
