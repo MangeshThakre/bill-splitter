@@ -3,11 +3,12 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { useState, useRef } from "react";
 // img
-import persionImg from "../../asset/persion.png";
-import groupImg from "../../asset/group.png";
+import persionImg from "../../../asset/persion.png";
+import groupImg from "../../../asset/group.png";
 // icon
-import corssIcon from "../../asset/cross.png";
-import { user } from "../../redux/globalSplice";
+import corssIcon from "../../../asset/cross.png";
+
+import { user } from "../../../redux/globalSplice";
 
 function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
   const groupListEle = useRef("");
@@ -31,23 +32,37 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
     li.className = "flex gap-3 items-center mt-4";
     li.id = `${memberNo}_groupMember`;
     li.innerHTML = newMemberEle(persionImg, memberNo);
+
+    // add event listner to name input
+    li.children[1].firstElementChild.addEventListener("input", (e) =>
+      handleDropdownMemberName(e)
+    );
+    li.children[2].addEventListener("input", (event) =>
+      handleEmailInput(event.target)
+    );
     groupListEle.current.appendChild(li);
   }
 
-  async function handleAddGroup() {}
+  function handleEmailInput(element) {
+    element.style.backgroundColor = "#f9fafb";
+  }
 
-  function handleDropdownMemberName(e) {
+  function handleDropdownMemberName(element) {
+    //  change background color of email element every time and
+    const emailEle = element.target.parentElement.parentElement.children[2];
+    emailEle.style.backgroundColor = "#f9fafb";
+
     // target dropdown useing current element  and removeing all teh child element
-    const dorpdownEle = e.target.parentElement.lastElementChild;
+    const dorpdownEle = element.target.parentElement.lastElementChild;
     dorpdownEle.firstElementChild.innerHTML = "";
 
     // find the friend Name for dropdown base on current inpute value
-    const filteredName = allFriends.filter(({ name, email }) =>
-      name.includes(e.target.value)
+    const filteredName = filteredRemaningName().filter((e) =>
+      e.name.toLowerCase().includes(element.target.value)
     );
 
     //  if current inpute value not matches any firend name form freind list then hide teh dropdown and return
-    if (filteredName.length < 1 || e.target.value == "") {
+    if (filteredName.length < 1 || element.target.value == "") {
       return (dorpdownEle.className = "hidden");
     }
 
@@ -55,24 +70,81 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
     filteredName.forEach((e, id) => {
       const li = document.createElement("li");
       li.innerHTML = dropdownMemberNameEle(e.name, id);
+      li.className = "cursor-pointer";
+      li.id = id + "_name";
+
+      // add event listener
+      li.addEventListener("click", (e) => selectDropDownName(e.target));
       dorpdownEle.firstElementChild.appendChild(li);
     });
 
     // display the dropdown of friends name who matches the input value
     dorpdownEle.className =
-      "absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll  h-36";
+      "absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll   max-h-36";
     // diefault className of dropdownEle  is "hidden absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700"
     // remove the hidden from className to display teh dropdown
+
+    //  remove event listner every time from teh popup-modal element
+    document
+      .querySelector("#popup-modal")
+      .removeEventListener("click", eventfunction);
+
+    // event listner to hide dropdown when coick anyware expect dropdoen element
+    document
+      .querySelector("#popup-modal")
+      .addEventListener("click", eventfunction);
+
+    function eventfunction(e) {
+      // Check if the filter list parent element exist
+      const isClosest = e.target.closest("#dropdown");
+      // If `isClosest` equals falsy & popup has the class `show`
+      // then hide the popup
+      if (!isClosest) {
+        dorpdownEle.className = "hidden";
+      }
+    }
   }
 
-  function dropdownMemberNameEle(name, id) {
-    return `<li id =${id}>
-              <p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                ${name}
-              </p>
-          </li>`;
+  function filteredRemaningName() {
+    const membersArr = [];
+    const groupMambersNameArr = document.querySelectorAll("#groupMemberName");
+    const groupMemberEmailArr = document.querySelectorAll("#groupMemberEmail");
+    groupMambersNameArr.forEach((e, i) => {
+      membersArr.push({ name: e.value, email: groupMemberEmailArr[i].value });
+    });
+
+    const filteredDropdownNamesArr = [];
+    allFriends.forEach((e) => {
+      const filterMember = membersArr.find(
+        (inputMamber) => inputMamber.name === e.name
+      );
+      if (!filterMember) filteredDropdownNamesArr.push(e);
+    });
+    console.log(filteredDropdownNamesArr);
+    return filteredDropdownNamesArr;
   }
 
+  function selectDropDownName(element) {
+    const dropdownEle = element.parentElement.parentElement.parentElement;
+    const inputEle =
+      element.parentElement.parentElement.parentElement.parentElement
+        .firstElementChild;
+    const emailEle =
+      element.parentElement.parentElement.parentElement.parentElement
+        .parentElement.children[2];
+
+    const name = element.textContent;
+    const { email } = allFriends.find((e) => e.name === name);
+
+    inputEle.value = name;
+    emailEle.value = email;
+
+    // emailEle.disabled = true;
+    if (email) emailEle.style.backgroundColor = "#f7be38";
+    dropdownEle.className = "hidden";
+  }
+
+  //  html elements
   function newMemberEle(img, memberNo) {
     return `
     <img
@@ -80,17 +152,30 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
       class="w-10 h-10 rounded-full"
       alt="freind"
     />
+    <span class="relative w-full">
     <input
       type="text"
-      id="name"
+      id="groupMemberName"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="name"
       required
       name = ${memberNo + "_name"}
-    />
+      />
+
+    <div
+    id="dropdown"
+    class="hidden absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll  h-36"
+  >
+    <ul
+      class="py-1 text-sm text-gray-700 dark:text-gray-200"
+      aria-labelledby="dropdownDefault"
+    >
+    </ul>
+  </div>
+  </span>
     <input
       type="text"
-      id="email"
+      id="groupMemberEmail"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="email@.com"
       name =${memberNo + "_email"}
@@ -105,14 +190,20 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
   `;
   }
 
+  function dropdownMemberNameEle(name) {
+    return `<p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">${name}</p>`;
+  }
+
+  async function handleAddGroup() {}
+
   return (
     <>
       {showAddGroupPopUp ? (
         <div
           id="popup-modal"
           tabIndex="-1"
-          className="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full justify-center items-center"
-          aria-hidden="true"
+          className="flex    overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full justify-center items-center"
+          ariaHidden="true"
         >
           <div className="relative p-4  h-full md:h-auto">
             <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700  max-h-[90vh] overflow-y-auto">
@@ -123,7 +214,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                 data-modal-toggle="popup-modal"
               >
                 <svg
-                  aria-hidden="true"
+                  ariaHidden="true"
                   className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -145,15 +236,15 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                     className="roundeds-lg h-36 w-36 "
                     alt="group"
                   /> */}
-                  <div class="flex justify-center items-center w-full ">
+                  <div className="flex justify-center items-center w-full ">
                     <label
-                      for="dropzone-file"
-                      class="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                      htmlFor="dropzone-file"
+                      className="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                     >
-                      <div class="flex flex-col justify-center items-center pt-5 px-2 pb-6">
+                      <div className="flex flex-col justify-center items-center pt-5 px-2 pb-6">
                         <svg
                           ariaHidden="true"
-                          class="mb-3 w-10 h-10 text-gray-400"
+                          className="mb-3 w-10 h-10 text-gray-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -162,19 +253,23 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            stroke-width="2"
+                            strokeWidth="2"
                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                           ></path>
                         </svg>
-                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span class="font-semibold">Click to upload</span> or
-                          drag and drop
+                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold">Click to upload</span>{" "}
+                          or drag and drop
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           SVG, PNG, JPG or GIF (MAX. 800x400px)
                         </p>
                       </div>
-                      <input id="dropzone-file" type="file" class="hidden" />
+                      <input
+                        id="dropzone-file"
+                        type="file"
+                        className="hidden"
+                      />
                     </label>
                   </div>
                 </div>
@@ -208,7 +303,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                       </h1>
 
                       <ul ref={groupListEle}>
-                        {/*  */}
+                        {/*   firsts*/}
                         <li className="flex gap-3 items-center mt-4">
                           <img
                             src={USER.profilePhoto}
@@ -230,49 +325,42 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                           <span className="relative w-full">
                             <input
                               type="text"
-                              id="name"
-                              class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              id="groupMemberName"
+                              className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                               placeholder="name"
                               required
                               onChange={(e) => handleDropdownMemberName(e)}
                             />
                             <div
                               id="dropdown"
-                              class="hidden absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll  h-36"
+                              className="hidden absolute  z-10 w-full bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 overflow-scroll  h-36"
                             >
                               <ul
-                                class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                                className="py-1 text-sm text-gray-700 dark:text-gray-200"
                                 aria-labelledby="dropdownDefault"
                               >
-                                <li>
-                                  <p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    Dashboard
-                                  </p>
-                                </li>
-                                <li>
-                                  <p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    Settings
-                                  </p>
-                                </li>
+                                {/* dynamic name list */}
                               </ul>
                             </div>
                           </span>
 
                           <input
                             type="text"
-                            id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            id="groupMemberEmail"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="email@.com"
-                            required
+                            onChange={(e) => handleEmailInput(e.target)}
                           />
                           <button
                             type="button"
-                            onClick={(e) => e.target.parentElement.remove()}
-                            class="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
+                            // onClick={(e) => e.target.parentElement.remove()}
+                            className=" opacity-0  c  cursor-default  text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center  items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
                           >
                             x
                           </button>
                         </li>
+
+                        {/*  remaining dynamic */}
                       </ul>
                       <div
                         id="addPersion"
@@ -285,11 +373,11 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
 
                     <button
                       type="submit"
-                      class="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
+                      className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
                     >
                       Save
                       <svg
-                        aria-hidden="true"
+                        ariaHidden="true"
                         role="status"
                         className="inline mr-3 w-4 h-4 text-white animate-spin ml-2"
                         viewBox="0 0 100 101"

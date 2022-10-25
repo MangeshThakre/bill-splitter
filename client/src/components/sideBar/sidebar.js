@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 // popup component
 import LogoutPopUp from "../popup/LogoutPopUp.js";
 import AddFriendPopUp from "../popup/AddFriendPopUp.js";
-import AddGroupPopUp from "../popup/AddGroupPopUp.js";
+import AddGroupPopUp from "../popup/addGroupPopup/AddGroupPopUp.js";
 // icon
 import addIcon from "../../asset/add.png";
 import arrowDown from "../../asset/arrowDown.png";
