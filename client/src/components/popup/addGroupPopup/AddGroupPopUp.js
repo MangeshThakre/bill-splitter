@@ -4,7 +4,10 @@ import { useSelector } from "react-redux";
 import { useState, useRef } from "react";
 // img
 import persionImg from "../../../asset/persion.png";
-import groupImg from "../../../asset/group.png";
+import Home from "../../../asset/home.jpg";
+import Other from "../../../asset/others.jpg";
+import Couple from "../../../asset/couple.jpg";
+import Trip from "../../../asset/trip.jpg";
 // icon
 import corssIcon from "../../../asset/cross.png";
 
@@ -24,6 +27,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
   ];
   const USER = useSelector((state) => state.global.user);
   const [groupMember, setGroupMamber] = useState([]);
+  const [groupType, setGroupType] = useState("Home");
 
   function handleAddGroupMember() {
     const groupMembersEleArr = groupListEle.current.children;
@@ -105,13 +109,18 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
     }
   }
 
-  function filteredRemaningName() {
+  function forminputMember() {
     const membersArr = [];
     const groupMambersNameArr = document.querySelectorAll("#groupMemberName");
     const groupMemberEmailArr = document.querySelectorAll("#groupMemberEmail");
     groupMambersNameArr.forEach((e, i) => {
       membersArr.push({ name: e.value, email: groupMemberEmailArr[i].value });
     });
+    return membersArr;
+  }
+
+  function filteredRemaningName() {
+    const membersArr = forminputMember();
 
     const filteredDropdownNamesArr = [];
     allFriends.forEach((e) => {
@@ -120,7 +129,6 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
       );
       if (!filterMember) filteredDropdownNamesArr.push(e);
     });
-    console.log(filteredDropdownNamesArr);
     return filteredDropdownNamesArr;
   }
 
@@ -172,14 +180,17 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
     >
     </ul>
   </div>
+  
   </span>
-    <input
-      type="text"
+    
+  <input
+      type="email"
       id="groupMemberEmail"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
       placeholder="email@.com"
       name =${memberNo + "_email"}
     />
+    
     <button
       type="button"
       onclick="this.parentElement.remove()"
@@ -187,14 +198,20 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
     >
       x
     </button>
-  `;
+  
+    `;
   }
 
   function dropdownMemberNameEle(name) {
     return `<p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">${name}</p>`;
   }
 
-  async function handleAddGroup() {}
+  async function handleAddGroup(event) {
+    event.preventDefault();
+    const groupName = event.target[0].value;
+    const membersArr = forminputMember();
+    console.log(membersArr);
+  }
 
   return (
     <>
@@ -237,40 +254,18 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                     alt="group"
                   /> */}
                   <div className="flex justify-center items-center w-full ">
-                    <label
-                      htmlFor="dropzone-file"
-                      className="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-                    >
-                      <div className="flex flex-col justify-center items-center pt-5 px-2 pb-6">
-                        <svg
-                          ariaHidden="true"
-                          className="mb-3 w-10 h-10 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                          ></path>
-                        </svg>
-                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-semibold">Click to upload</span>{" "}
-                          or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          SVG, PNG, JPG or GIF (MAX. 800x400px)
-                        </p>
-                      </div>
-                      <input
-                        id="dropzone-file"
-                        type="file"
-                        className="hidden"
-                      />
-                    </label>
+                    {groupType == "Home" ? (
+                      <img className=" rounded-lg  h-48 w-48" src={Home} />
+                    ) : null}
+                    {groupType == "Trip" ? (
+                      <img className=" rounded-lg  h-48 w-48" src={Trip} />
+                    ) : null}
+                    {groupType == "Couple" ? (
+                      <img className=" rounded-lg  h-48 w-48" src={Couple} />
+                    ) : null}
+                    {groupType == "Other" ? (
+                      <img className=" rounded-lg  h-48 w-48" src={Other} />
+                    ) : null}
                   </div>
                 </div>
                 {/* left end */}
@@ -280,7 +275,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                     START A NEW GROUP
                   </h1>
                   {/* from */}
-                  <form>
+                  <form onSubmit={(e) => handleAddGroup(e)}>
                     <div className="my-6  ">
                       <label
                         htmlFor="password"
@@ -297,7 +292,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                       />
                     </div>
                     {/* group menmber */}
-                    <div className="border-t-[1px] border-gray-500 pt-2">
+                    <div className="border-y-[1px] border-gray-400 mb-3 pt-2">
                       <h1 className="text-gray-500   text-2xl font-bold">
                         Group Members
                       </h1>
@@ -345,7 +340,7 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                           </span>
 
                           <input
-                            type="text"
+                            type="email"
                             id="groupMemberEmail"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="email@.com"
@@ -368,6 +363,58 @@ function AddGroupPopUp({ showAddGroupPopUp, setShowGroupPopUp }) {
                         className="my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                       >
                         + Add a persion
+                      </div>
+                    </div>
+                    {/* group type */}
+                    <div>
+                      <h1 className=" font-bold   text-xl text-gray-500">
+                        Group Type
+                      </h1>
+                      <div className="flex gap-3  my-5">
+                        <button
+                          onClick={(e) => setGroupType("Home")}
+                          type="button"
+                          className={
+                            groupType == "Home"
+                              ? "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                              : "text-white bg-gray-400 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                          }
+                        >
+                          Home
+                        </button>
+                        <button
+                          onClick={(e) => setGroupType("Trip")}
+                          type="button"
+                          className={
+                            groupType == "Trip"
+                              ? "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                              : "text-white bg-gray-400 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                          }
+                        >
+                          Trip
+                        </button>
+                        <button
+                          onClick={(e) => setGroupType("Couple")}
+                          type="button"
+                          className={
+                            groupType == "Couple"
+                              ? "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                              : "text-white bg-gray-400 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                          }
+                        >
+                          Couple
+                        </button>
+                        <button
+                          onClick={(e) => setGroupType("Other")}
+                          type="button"
+                          className={
+                            groupType == "Other"
+                              ? "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                              : "text-white bg-gray-400 hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                          }
+                        >
+                          Other
+                        </button>
                       </div>
                     </div>
 
