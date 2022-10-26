@@ -3,6 +3,7 @@ const passport = require("passport");
 const authcontroller = require("../controller/auth.js");
 require("../pasport.js");
 
+// login success ?
 router.get("/login/success", (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json({
@@ -15,6 +16,7 @@ router.get("/login/success", (req, res) => {
   }
 });
 
+// logout
 router.get("/logout", (req, res) => {
   req.session.destroy();
   res.json({ error: false, message: "successfuly logout" });
@@ -28,6 +30,7 @@ router.post("/signin", passport.authenticate("local"), authcontroller.singIn);
 
 // google-statergy
 router.get("/google", passport.authenticate("google", ["profile", "email"]));
+
 
 router.get(
   "/google/callback",

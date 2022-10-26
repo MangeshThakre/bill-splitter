@@ -6,6 +6,7 @@ const router = require("./router/router.js");
 const authRoute = require("./router/auth.js");
 
 const expressSession = require("express-session");
+const { route } = require("./router/router.js");
 const MongoDbStore = require("connect-mongodb-session")(expressSession);
 
 const app = express();
@@ -63,6 +64,8 @@ app.use(passport.session());
 
 //  router
 app.use("/auth", authRoute);
+app.use("/api", router);
+
 app.use((err, req, res, dome) => {
   if (err) console.log("server.js", err);
 });

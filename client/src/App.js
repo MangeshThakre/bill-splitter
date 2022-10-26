@@ -15,6 +15,7 @@ import UserPage from "./components/pages/userpage/UserPage";
 import Dashbord from "./components/pages/dashbord/Dashbord.js";
 import AllExpense from "./components/pages/allExpenses/AllExpense";
 import RecentAcitvity from "./components/pages/recentAcitvity/RecentAcitvity";
+import Group from "./components/pages/groups/Group.js";
 
 import { useNavigate } from "react-router-dom";
 function App() {
@@ -69,24 +70,20 @@ function App() {
               />
             </Routes>
           ) : (
-            <div className="pt-20 h-full flex justify-between">
+            <div className="pt-20 h-full flex">
               <Sidebar />
-              <div className="w-full  mx-2 shadow-xl">
+              <div className="w-full  flex">
                 <Routes>
-                  <Route exact path="/dashbord" element={<Dashbord />} />
-                  <Route
-                    exact
-                    path="/recent-acitvity"
-                    element={<RecentAcitvity />}
-                  />
-                  <Route exact path="/all-expenses" element={<AllExpense />} />
-                  <Route exact path="/users" element={<UserPage />} />
-                  <Route exact path="/all-expenses" element={<UserPage />} />
-
+                  <Route path="/dashbord" element={<Dashbord />} />
+                  <Route path="/recent-acitvity" element={<RecentAcitvity />} />
+                  <Route path="/all-expenses" element={<AllExpense />} />
+                  <Route path="/users" element={<UserPage />} />
+                  <Route path="/all-expenses" element={<UserPage />} />
+                  <Route path="/group/:id" element={<Group />} />
                   <Route path="*" element={<div>page not found</div>} />
                 </Routes>
               </div>
-              <Sidebar />
+              {/* <Sidebar /> */}
             </div>
           )}
         </>

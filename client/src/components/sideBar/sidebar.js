@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { user } from "../../redux/globalSplice.js";
-import { useDispatch } from "react-redux";
+import { user, groups, friends } from "../../redux/globalSplice.js";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 // popup component
@@ -13,9 +13,22 @@ import addIcon from "../../asset/add.png";
 import arrowDown from "../../asset/arrowDown.png";
 import arrowRight from "../../asset/arrowRight.png";
 
+//// components
+// skeleton list
+import ListSkeleton from "./ListSkeleton.js";
+// list with info
+import ListWithInfo from "./ListWithInfo.js";
+
 function Sidebar() {
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
+
+  //  redux variables
+  const USER = useSelector((state) => state.global.user);
+  const GROUPS = useSelector((state) => state.global.groups);
+  const FRIENDS = useSelector((state) => state.global.friends);
+
+  // toggal list
   const [showGroupList, setShowGroutList] = useState(false);
   const [showFriendList, setShowFriendList] = useState(false);
 
@@ -23,6 +36,49 @@ function Sidebar() {
   const [loguotPopUp, setLoguotPopu] = useState(false);
   const [showAddFreindpopUp, setShowAddFreindpopUp] = useState(false);
   const [showAddGroupPopUp, setShowGroupPopUp] = useState(false);
+
+  // loading
+  const [isGetGropusLoading, setIsGetGroupLoading] = useState(false);
+  const [isGetFriendsLoading, setIsGetFriendLoading] = useState(false);
+
+  useEffect(() => {
+    getGroups();
+    getFriends();
+  }, []);
+
+  async function getGroups() {
+    setIsGetGroupLoading(true);
+    try {
+      const response = await axios({
+        method: "post",
+        url: URL + "/api/get_groups",
+        data: { userEmail: USER.email },
+      });
+      const data = await response.data.data;
+      dispatch(groups(data));
+      setIsGetGroupLoading(false);
+    } catch (error) {
+      setIsGetGroupLoading(false);
+      console.log(error);
+    }
+  }
+
+  async function getFriends() {
+    setIsGetFriendLoading(false);
+    try {
+      const response = await axios({
+        method: "post",
+        url: URL + "/api/get_friends",
+        data: { userId: USER._id },
+      });
+      const data = await response.data.data;
+      dispatch(friends(data));
+      setIsGetGroupLoading(false);
+    } catch (error) {
+      setIsGetGroupLoading(false);
+      console.log(error);
+    }
+  }
 
   return (
     <>
@@ -142,42 +198,35 @@ function Sidebar() {
               </button>
               <ul
                 id="dropdown-example"
-                className={showGroupList ? "" : "hidden " + `py-2 space-y-2`}
+                className={
+                  showGroupList
+                    ? "p-1 flex flex-col gap-2  rounded-md mt-1 bg-[#80808021]"
+                    : "hidden "
+                }
               >
                 <li>
                   <a
                     href="#"
                     onClick={() => setShowGroupPopUp((prev) => !prev)}
-                    className="flex items-center p-2 pl-10 px-4  justify-between w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 pl-4   gap-7 w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   >
+                    <img src={addIcon} className="w-3 ml-2" alt="add" />
                     Add Group
-                    <img src={addIcon} className="w-3" alt="add" />
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Products
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Billing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Invoice
-                  </a>
-                </li>
+
+                {isGetGropusLoading ? (
+                  <>
+                    <li>
+                      <ListSkeleton />
+                    </li>
+                    <li>
+                      <ListSkeleton />
+                    </li>
+                  </>
+                ) : (
+                  <ListWithInfo listInfo={GROUPS} type={"group"} />
+                )}
               </ul>
             </li>
             {/* Friend list */}
@@ -211,42 +260,34 @@ function Sidebar() {
               </button>
               <ul
                 id="dropdown-example"
-                className={showFriendList ? "" : "hidden " + `py-2 space-y-2`}
+                className={
+                  showFriendList
+                    ? "p-1 flex flex-col gap-2 rounded-md mt-1 bg-[#80808021]"
+                    : "hidden"
+                }
               >
                 <li>
                   <a
                     href="#"
                     onClick={() => setShowAddFreindpopUp((prev) => !prev)}
-                    className="flex items-center p-2 pl-10 px-4  justify-between w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 pl-4 gap-7 w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   >
+                    <img src={addIcon} className="w-3 ml-2" alt="add" />
                     Add Firend
-                    <img src={addIcon} className="w-3" alt="add" />
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Products
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Billing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Invoice
-                  </a>
-                </li>
+                {isGetFriendsLoading ? (
+                  <>
+                    <li>
+                      <ListSkeleton />
+                    </li>
+                    <li>
+                      <ListSkeleton />
+                    </li>
+                  </>
+                ) : (
+                  <ListWithInfo listInfo={FRIENDS} type={"friend"} />
+                )}
               </ul>
             </li>
             {/* log out */}

@@ -1,35 +1,72 @@
 const mongoose = require("../database.js");
+// model
 const userModel = require("../schema/user_schema.js");
+const groupModel = require("../schema/groupSchema.js");
+const firendsModel = require("../schema/friendsSchema.js");
 
 class controller {
-  static singin(req, res) {
-    res.json({ status: "success" });
+  static async create_group(req, res) {
+    const userId = req.body.creator.id;
+    const name = req.body.creator.name;
+    const email = req.body.creator.email;
+
+    const memberArr = [
+      {
+        name: req.body.creator.name,
+        email: req.body.creator.email,
+      },
+      ...req.body.membersArr,
+    ];
+
+    const groupInfo = new groupModel({
+      creator: req.body.creator,
+      groupName: req.body.groupName,
+      groupType: req.body.groupType,
+      membersArr: memberArr,
+    });
+
+    try {
+      const groupResult = await groupInfo.save();
+      const freindsinfo = new firendsModel({
+        name,
+        email,
+        userId,
+        friendsArr: req.body.membersArr,
+      });
+      // const friendResult = await freindsinfo.save();
+      // console.log(friendResult);
+      res.json({ error: false, data: groupResult });
+    } catch (error) {
+      res.json({
+        error: true,
+        error: error,
+      });
+      console.log(error);
+    }
   }
 
-  static async signup(req, res) {
-    const passWord = req.body.passWord;
-    const phoneNo = req.body.phoneNo;
-    const email = req.body.email;
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-
-    const userExist = await userModel.findOne({ email });
-    if (userExist) {
-      return res.status(401).json({
-        error: true,
-        message: "already login with " + userExist.source,
+  // get group list
+  static async get_groups(req, res) {
+    const userEmail = req.body.userEmail;
+    try {
+      const groups = await groupModel.find({
+        membersArr: { $elemMatch: { email: userEmail } },
       });
+      res.json({ error: false, data: groups });
+    } catch (error) {
+      res.json({ error: true, message: error.message });
     }
-    const userInfo = new userModel({
-      passWord,
-      phoneNo,
-      email,
-      firstName,
-      lastName,
-      source: "local",
-    });
-    const result = await userInfo.save();
-    res.status(200).json({ error: false, data: result });
+  }
+
+  // get friends
+  static async get_friends(req, res) {
+    const userId = req.body.userId;
+    try {
+      const { friendsArr } = await firendsModel.findOne({ userId });
+      res.json({ error: false, data: friendsArr });
+    } catch (error) {
+      res.json({ error: true, message: error.message });
+    }
   }
 }
 
