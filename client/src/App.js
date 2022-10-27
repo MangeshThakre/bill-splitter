@@ -83,7 +83,6 @@ function App() {
                   <Route path="*" element={<div>page not found</div>} />
                 </Routes>
               </div>
-              {/* <Sidebar /> */}
             </div>
           )}
         </>

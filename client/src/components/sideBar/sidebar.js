@@ -50,12 +50,11 @@ function Sidebar() {
     setIsGetGroupLoading(true);
     try {
       const response = await axios({
-        method: "post",
-        url: URL + "/api/get_groups",
-        data: { userEmail: USER.email },
+        method: "get",
+        url: URL + "/api/get_groups?userEmail=" + USER.email,
       });
       const data = await response.data.data;
-      dispatch(groups(data));
+      if (data) dispatch(groups(data));
       setIsGetGroupLoading(false);
     } catch (error) {
       setIsGetGroupLoading(false);
@@ -67,12 +66,11 @@ function Sidebar() {
     setIsGetFriendLoading(false);
     try {
       const response = await axios({
-        method: "post",
-        url: URL + "/api/get_friends",
-        data: { userId: USER._id },
+        method: "get",
+        url: URL + "/api/get_friends?userId=" + USER._id,
       });
       const data = await response.data.data;
-      dispatch(friends(data));
+      if (data) dispatch(friends(data));
       setIsGetGroupLoading(false);
     } catch (error) {
       setIsGetGroupLoading(false);
