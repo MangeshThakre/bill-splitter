@@ -10,6 +10,7 @@ const friendsSchema = new Schema({
       {
         name: { type: String, require: true },
         email: { type: String },
+        userId: { type: String, require: true },
       },
       { _id: false }
     ),

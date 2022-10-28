@@ -3,6 +3,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { user } from "../../../redux/globalSplice";
 // img
 import persionImg from "../../../asset/persion.png";
 import Home from "../../../asset/home.jpg";
@@ -10,9 +11,8 @@ import Other from "../../../asset/others.jpg";
 import Couple from "../../../asset/couple.jpg";
 import Trip from "../../../asset/trip.jpg";
 // icon
-import corssIcon from "../../../asset/cross.png";
 
-import { user } from "../../../redux/globalSplice";
+import corssIcon from "../../../asset/cross.png";
 
 function AddGroupPopUp({
   showAddGroupPopUp,
@@ -54,7 +54,7 @@ function AddGroupPopUp({
       setGroupMamber(currentGroup.membersArr);
       setGroupName(currentGroup.groupName);
     }
-  });
+  }, [showAddGroupPopUp]);
 
   function handleAddGroupMember() {
     const groupMembersEleArr = groupListEle.current.children;
@@ -351,7 +351,7 @@ function AddGroupPopUp({
           id="popup-modal"
           tabIndex="-1"
           className="flex   bg-[#23232382]   overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full justify-center items-center"
-          ariaHidden="true"
+          aria-hidden="true"
         >
           <div className="relative p-4  h-full md:h-auto">
             <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700  max-h-[90vh] overflow-y-auto">
@@ -363,7 +363,7 @@ function AddGroupPopUp({
                 data-modal-toggle="popup-modal"
               >
                 <svg
-                  ariaHidden="true"
+                  aria-hidden="true"
                   className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -631,7 +631,7 @@ function AddGroupPopUp({
                         {isEdit ? "Update" : "Save"}
                         {isSaveLoading ? (
                           <svg
-                            ariaHidden="true"
+                            aria-hidden="true"
                             role="status"
                             className="inline mr-3 w-4 h-4 text-white animate-spin ml-2"
                             viewBox="0 0 100 101"
@@ -660,7 +660,7 @@ function AddGroupPopUp({
                           Delete Group
                           {isDeleteLoading ? (
                             <svg
-                              ariaHidden="true"
+                              aria-hidden="true"
                               role="status"
                               className="inline mr-3 w-4 h-4 text-white animate-spin ml-2"
                               viewBox="0 0 100 101"
