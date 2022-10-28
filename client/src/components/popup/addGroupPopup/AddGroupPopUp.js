@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { user } from "../../../redux/globalSplice";
+import { friends, user, groups } from "../../../redux/globalSplice";
 // img
 import persionImg from "../../../asset/persion.png";
 import Home from "../../../asset/home.jpg";
@@ -20,21 +20,13 @@ function AddGroupPopUp({
   isEdit = false,
   currentGroup = [],
 }) {
+  const dispatch = useDispatch();
   const groupListEle = useRef("");
   const USER = useSelector((state) => state.global.user);
   const GROUPS = useSelector((state) => state.global.groups);
+  const FRIENDS = useSelector((state) => state.global.friends);
   const URL = process.env.REACT_APP_URL;
-
-  const allFriends = [
-    { name: "test 1", email: "textone@gmail.com" },
-    { name: "test 2", email: "texttwo@gmail.com" },
-    { name: "test 3", email: "textthree@gmail.com" },
-    { name: "test 4", email: "" },
-    { name: "test 5", email: "textfive@gmail.com" },
-    { name: "test 6", email: "textsix@gmail.com" },
-    { name: "test 7", email: "textseven@gmail.com" },
-    { name: "test 8", email: "" },
-  ];
+  const allFriends = FRIENDS.length > 0 ? FRIENDS : [];
 
   const [groupMember, setGroupMamber] = useState([]);
   const [groupType, setGroupType] = useState("Home");
@@ -143,7 +135,7 @@ function AddGroupPopUp({
     groupMambersNameArr.forEach((e, i) => {
       membersArr.push({
         name: e.value.trim(),
-        email: groupMemberEmailArr[i].value.trim(),
+        email: groupMemberEmailArr[i].value.trim().toLowerCase(),
       });
     });
     return membersArr;
@@ -253,7 +245,7 @@ function AddGroupPopUp({
       (e) => e.groupName.toLowerCase() == groupName.toLowerCase()
     );
 
-    // check of group name is already exist
+    // check if group name is already exist
     if (isGroupExist) {
       return handleAlert(
         true,
@@ -267,11 +259,12 @@ function AddGroupPopUp({
       isUnique = !membersArr.some(
         (e, index) =>
           e.name === membersArr[i].name &&
-          e.email.toLowerCase() === membersArr[i].email.toLowerCase() &&
+          e.email === membersArr[i].email &&
           index !== i
       );
       if (!isUnique) break;
     }
+
     if (!isUnique) return handleAlert(true, "please dont repeat same member");
     ////
 
@@ -289,8 +282,11 @@ function AddGroupPopUp({
         data: { creator, groupName, membersArr, groupType },
       });
 
-      const data = await response.data;
-      console.log(data);
+      const { groupResult, friendResult } = await response.data;
+      // add group and update griends in readux
+      dispatch(groups([...GROUPS, groupResult]));
+      dispatch(friends(friendResult.friendsArr));
+
       setIsSaveLoading(false);
     } catch (error) {
       setIsSaveLoading(false);
@@ -409,6 +405,7 @@ function AddGroupPopUp({
                   </h1>
                   {/* from */}
                   <form
+                    autoComplete="off"
                     onSubmit={(e) =>
                       isEdit ? handleUpdate(e) : handleAddGroup(e)
                     }
@@ -499,7 +496,10 @@ function AddGroupPopUp({
                           <>
                             {groupMember.map((member, index) => {
                               return (
-                                <li className="flex gap-3 items-center mt-4">
+                                <li
+                                  key={index}
+                                  className="flex gap-3 items-center mt-4"
+                                >
                                   <img
                                     src={persionImg}
                                     className="w-10 h-10 rounded-full"
