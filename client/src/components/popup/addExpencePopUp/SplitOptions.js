@@ -1,6 +1,15 @@
 import React from "react";
+function SplitOptions({ setSecondaryPopUp, members, setSplitWith, splitWith }) {
+  function handelForm(e) {
+    if (!e.target.checked && splitWith.includes(e.target.value)) {
+      const newSplitWith = [...splitWith];
+      newSplitWith.splice(newSplitWith.indexOf(e.target.value), 1);
+      setSplitWith(newSplitWith);
+    } else if (e.target.checked && !splitWith.includes(e.target.value)) {
+      setSplitWith([...splitWith, e.target.value]);
+    }
+  }
 
-function SplitOptions({ setSecondaryPopUp, members }) {
   return (
     <div className="relative p-4 w-full max-w-md h-full md:h-auto">
       <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -34,7 +43,33 @@ function SplitOptions({ setSecondaryPopUp, members }) {
               Choose split option
             </h1>
           </div>
-          <div></div>
+          <div className="p-6">
+            <h1 className="font-semibold text-xl mb-5">Split equally</h1>
+            <form
+              className="flex flex-col gap-4"
+              onChange={(e) => handelForm(e)}
+            >
+              {members.map((e, i) => {
+                return (
+                  <div key={i} className="flex items-center gap-5">
+                    <input
+                      defaultChecked
+                      id="checked-checkbox"
+                      type="checkbox"
+                      value={e.userId}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label
+                      htmlFor="checked-checkbox"
+                      className="ml-2 text-lg font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {e.name}
+                    </label>
+                  </div>
+                );
+              })}
+            </form>
+          </div>
         </div>
       </div>
     </div>

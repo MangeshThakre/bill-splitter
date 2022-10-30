@@ -12,6 +12,7 @@ class controller {
     const email = req.body.creator.email;
     const membersArr = req.body.membersArr;
 
+    //  schema vallidation function for group
     function groupInfo(allMemberArr) {
       return new groupModel({
         creator: req.body.creator,
@@ -20,7 +21,7 @@ class controller {
         membersArr: allMemberArr,
       });
     }
-
+    //  schema vallidation function for friends
     function freindsinfo(friendsArr) {
       return new firendsModel({
         name,
@@ -30,6 +31,7 @@ class controller {
       });
     }
 
+    // handle member with email
     async function handleMemberWithEmail(memberWithEmail) {
       const membersEmailArr = memberWithEmail.map((e) => e.email);
       const userExist = await userModel.find({ email: membersEmailArr });
@@ -54,8 +56,25 @@ class controller {
       return memberWithUserId;
     }
 
+    //  handle group arr and friendarr
+    async function handleGroupAndFriendArr(membersArr) {
+      const memberWithEmail = membersArr.filter((e) => e.email);
+      const memberWithUserId = await handleMemberWithEmail(memberWithEmail);
+      const memberWithoutArr = membersArr
+        .filter((e) => !e.email)
+        .map((e) => {
+          return { name: e.name, email: e.email, userId: uuidv4() };
+        });
+      const newFriendsArr = [...memberWithUserId, ...memberWithoutArr];
+      const newGroupMembersArr = [
+        { name, email, userId },
+        ...memberWithUserId,
+        ...memberWithoutArr,
+      ];
+      return { newFriendsArr, newGroupMembersArr };
+    }
+
     try {
-      const friendsData = await firendsModel.findOne({ userId });
       // check friends if present or not
       // if not -  add all the group member as a friend
       //           check first if the groupmember has name as wall as email
@@ -72,28 +91,24 @@ class controller {
       //                    if no - add the uuid to the group member
       //           if no - add the uuid to the group member
 
+      const friendsData = await firendsModel.findOne({ userId });
       if (!friendsData) {
-        const memberWithEmail = membersArr.filter((e) => e.email);
-        const memberWithUserId = await handleMemberWithEmail(memberWithEmail);
-        const memberWithoutArr = membersArr
-          .filter((e) => !e.email)
-          .map((e) => {
-            return { name: e.name, email: e.email, userId: uuidv4() };
-          });
-        const friendsArr = [...memberWithUserId, ...memberWithoutArr];
-        const groupMembersArr = [
-          { name, email, userId },
-          ...memberWithUserId,
-          ...memberWithoutArr,
-        ];
+        const { newFriendsArr, newGroupMembersArr } =
+          await handleGroupAndFriendArr(membersArr);
         // console.log("friendsArr", friendsArr);
         // console.log("groupMembersArr", groupMembersArr);
-        const friendResult = await freindsinfo(friendsArr).save();
-        const groupResult = await groupInfo(groupMembersArr).save();
-        res.status(200).send({ groupResult, friendResult });
+
+        const friendResult = await freindsinfo(newFriendsArr).save();
+        const groupResult = await groupInfo(newGroupMembersArr).save();
+
+        res
+          .status(200)
+          .send({ groupResult, friendsArr: friendResult.friendsArr });
       } else {
         const newMemberArr = [];
         let existingMembersArr = [];
+
+        // seperate existing member and newmember
         membersArr.forEach((member) => {
           const friend = friendsData.friendsArr.find(
             (frnd) =>
@@ -104,29 +119,24 @@ class controller {
           else existingMembersArr.push(friend);
         });
 
-        const memberWithEmail = newMemberArr.filter((e) => e.email);
-        const memberWithUserId = await handleMemberWithEmail(memberWithEmail);
-        const memberWithoutArr = newMemberArr
-          .filter((e) => !e.email)
-          .map((e) => {
-            return { name: e.name, email: e.email, userId: uuidv4() };
-          });
-        const newfriendsArr = [...memberWithUserId, ...memberWithoutArr];
-        const groupMembersArr = [
-          { name, email, userId },
-          ...memberWithUserId,
-          ...memberWithoutArr,
-          ...existingMembersArr,
-        ];
-        // console.log("friendsArr", newfriendsArr);
-        // console.log("groupMembersArr", groupMembersArr);
-        const friendResult = await firendsModel.updateOne(
+        const { newFriendsArr, newGroupMembersArr } =
+          await handleGroupAndFriendArr(newMemberArr);
+
+        const groupMembersArr = [...newGroupMembersArr, ...existingMembersArr];
+
+        // console.log("new memver ", newMemberArr);
+        // console.log("existion member ", existingMembersArr);
+        // console.log("friendsArr", newFriendsArr);
+        // console.log("groupMembersArr", groupMe  mbersArr);
+
+        await firendsModel.updateOne(
           { userId },
-          { $push: { friendsArr: { $each: newfriendsArr } } },
+          { $push: { friendsArr: { $each: newFriendsArr } } },
           { new: true }
         );
+
         const groupResult = await groupInfo(groupMembersArr).save();
-        res.status(200).send({ groupResult, friendResult });
+        res.status(200).send({ groupResult, friendsArr: newFriendsArr });
       }
     } catch (error) {
       res.json({

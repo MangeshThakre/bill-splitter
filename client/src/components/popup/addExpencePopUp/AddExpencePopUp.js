@@ -1,6 +1,6 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useState } from "react";
-
 // popup
 import ChoosePayer from "./ChoosePayer.js";
 import SplitOptions from "./SplitOptions.js";
@@ -13,12 +13,25 @@ function AddExpencePopUp({
   setShowAddExpencePopUp,
   currentGroup,
 }) {
-  // loading
+  const USER = useSelector((state) => state.global.user);
+  // loadings
   const [isSaveLoading, setIsSaveLoading] = useState(true);
   const [SecondaryPopUp, setSecondaryPopUp] = useState(null);
-
+  const [amount, setAmount] = useState("");
   //
-  const [paidBy, setpaidBy] = useState("");
+  const [paidBy, setPaidBy] = useState({ name: "you", id: USER._id });
+  const [splitWith, setSplitWith] = useState(
+    currentGroup.membersArr.map((e) => e.userId)
+  );
+
+  console.log(splitWith);
+  console.log(amount / splitWith.length);
+  function handleAddExpanse(e) {
+    e.preventDefault();
+    const expanceName = e.target[0].value;
+    console.table({ expanceName, amount, paidBy, splitWith });
+    console.log(amount / splitWith.length);
+  }
 
   return (
     <>
@@ -64,7 +77,7 @@ function AddExpencePopUp({
                 </div>
                 {/* header end */}
                 {/* body */}
-                <form className="mt-6">
+                <form className="mt-6" onSubmit={(e) => handleAddExpanse(e)}>
                   <div className="flex gap-8">
                     <img
                       src={Home}
@@ -78,6 +91,7 @@ function AddExpencePopUp({
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Enter description"
                         required
+                        autoComplete="off"
                       />
                       <input
                         type="number"
@@ -86,6 +100,7 @@ function AddExpencePopUp({
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="0.00"
                         required
+                        onChange={(e) => setAmount(e.target.value)}
                       />
                     </div>
                   </div>
@@ -102,7 +117,7 @@ function AddExpencePopUp({
                         }
                         className="py-2 px-3 mx-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                       >
-                        Extra small
+                        {USER._id == paidBy.id ? "You" : paidBy.name}
                       </button>
                       and split
                       <button
@@ -116,11 +131,15 @@ function AddExpencePopUp({
                         }
                         className="py-2 px-3 mx-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                       >
-                        Extra small
+                        equally
                       </button>
                       ​.
                     </span>
-                    <span>(You owe nothing)</span>
+                    <span>
+                      {amount
+                        ? `(${amount / splitWith.length} / person)`
+                        : "(You owe nothing)"}
+                    </span>
                   </div>
                   {/* button */}
                   <div className="flex gap-8 mt-8 justify-end pt-3 border-t-2 border-gray-300">
@@ -170,7 +189,7 @@ function AddExpencePopUp({
             <ChoosePayer
               setSecondaryPopUp={setSecondaryPopUp}
               members={currentGroup.membersArr}
-              setpaidBy={setpaidBy}
+              setPaidBy={setPaidBy}
               paidBy={paidBy}
             />
           ) : null}
@@ -178,6 +197,8 @@ function AddExpencePopUp({
             <SplitOptions
               setSecondaryPopUp={setSecondaryPopUp}
               members={currentGroup.membersArr}
+              setSplitWith={setSplitWith}
+              splitWith={splitWith}
             />
           ) : null}
         </div>

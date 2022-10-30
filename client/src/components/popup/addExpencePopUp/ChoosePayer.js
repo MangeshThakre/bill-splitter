@@ -2,10 +2,22 @@ import React from "react";
 
 // image
 import persion from "../../../asset/persion.png";
+import { user } from "../../../redux/globalSplice";
 
-function ChoosePayer({ setSecondaryPopUp, members }) {
+function ChoosePayer({ setSecondaryPopUp, members, setPaidBy }) {
   function handleSelectMember(e) {
-    console.log(e);
+    if (e.name.split(" ") > 1) {
+      setPaidBy({
+        name: e.name.split(" ")[0] + " " + e.name.split(" ")[1][0],
+        id: e.userId,
+      });
+    } else {
+      setPaidBy({
+        name: e.name,
+        id: e.userId,
+      });
+    }
+    setSecondaryPopUp(false);
   }
 
   return (

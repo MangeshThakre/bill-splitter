@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { friends, user, groups } from "../../../redux/globalSplice";
 // img
 import persionImg from "../../../asset/persion.png";
@@ -21,6 +21,7 @@ function AddGroupPopUp({
   currentGroup = [],
 }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const groupListEle = useRef("");
   const USER = useSelector((state) => state.global.user);
   const GROUPS = useSelector((state) => state.global.groups);
@@ -209,7 +210,7 @@ function AddGroupPopUp({
       type="email"
       id="groupMemberEmail"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      placeholder="email@.com"
+      placeholder="email@.com  ( optional )"
       name =${memberNo + "_email"}
     />
     
@@ -258,13 +259,12 @@ function AddGroupPopUp({
     for (let i = 0; i < membersArr.length; i++) {
       isUnique = !membersArr.some(
         (e, index) =>
-          e.name === membersArr[i].name &&
+          e.name.toLowerCase() === membersArr[i].name.toLowerCase() &&
           e.email === membersArr[i].email &&
           index !== i
       );
       if (!isUnique) break;
     }
-
     if (!isUnique) return handleAlert(true, "please dont repeat same member");
     ////
 
@@ -282,12 +282,15 @@ function AddGroupPopUp({
         data: { creator, groupName, membersArr, groupType },
       });
 
-      const { groupResult, friendResult } = await response.data;
+      const { groupResult, friendsArr } = await response.data;
+
       // add group and update griends in readux
       dispatch(groups([...GROUPS, groupResult]));
-      dispatch(friends(friendResult.friendsArr));
+      dispatch(friends([...FRIENDS, ...friendsArr]));
 
       setIsSaveLoading(false);
+      setShowGroupPopUp(false);
+      navigate(`/group/${groupResult._id}`);
     } catch (error) {
       setIsSaveLoading(false);
       console.log(error);
@@ -432,9 +435,9 @@ function AddGroupPopUp({
                       <h1 className="text-gray-500   text-2xl font-bold">
                         Group Members
                       </h1>
-
                       <ul ref={groupListEle}>
                         {/*   firsts*/}
+
                         {!isEdit ? (
                           <>
                             <li className="flex gap-3 items-center mt-4">
@@ -480,7 +483,7 @@ function AddGroupPopUp({
                                 type="email"
                                 id="groupMemberEmail"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="email@.com"
+                                placeholder="email@.com ( optional )"
                                 onChange={(e) => handleEmailInput(e.target)}
                               />
                               <button
