@@ -3,7 +3,10 @@ const mongoose = require("../database.js");
 const userModel = require("../schema/user_schema.js");
 const groupModel = require("../schema/groupSchema.js");
 const firendsModel = require("../schema/friendsSchema.js");
+const expenseModel = require("../schema/expenseSchema.js");
+
 const { v4: uuidv4 } = require("uuid");
+
 class controller {
   //  create group
   static async create_group(req, res) {
@@ -173,13 +176,145 @@ class controller {
 
   // groupMemberDetail
   static async get_group_member_detail(req, res) {
-    const groupId = req.query.groupId;
-    // console.log()
+    const groupId = mongoose.Types.ObjectId(req.query.groupId);
     try {
-      const groupDateil = await groupModel.findById(groupId);
-      res.json({ error: false, data: groupDateil });
+      const groupDateil = await groupModel.aggregate([
+        { $match: { _id: groupId } },
+        { $addFields: { _idStr: { $toString: "$_id" } } },
+        {
+          $lookup: {
+            from: "expenses",
+            localField: "_idStr",
+            foreignField: "groupId",
+            as: "expensesArr",
+          },
+        },
+        { $unwind: "$expensesArr" },
+      ]);
+
+      function handleMembers(groupMembers, splitWith) {
+        const membersArr = [];
+        splitWith.forEach((e, i) => {
+          const member = groupMembers.find(
+            (member) => member.userId === e.userId
+          );
+          membersArr.push({
+            id: e.userId,
+            name: member.name,
+            email: member.email,
+            amountLeft: e.amountLeft,
+          });
+        });
+        return membersArr;
+      }
+      const groupExpenseData = [];
+      groupDateil.forEach((group) => {
+        const expenceData = {};
+        expenceData["memberArr"] = handleMembers(
+          group.membersArr,
+          group.expensesArr.splitWith
+        );
+        expenceData["expanseDescription"] =
+          group.expensesArr.expanseDescription;
+        expenceData["id"] = group.expensesArr._id;
+        expenceData["createdAt"] = group.expensesArr.createdAt;
+        expenceData["amount"] = group.expensesArr.amount;
+        expenceData["paidBy"] = group.expensesArr.paidBy;
+        groupExpenseData.push(expenceData);
+      });
+
+      res.status(200).json(groupExpenseData);
     } catch (error) {
-      res.json({ error: true, message: error.message });
+      res.status(500).json(error);
+      console.log(error);
+    }
+  }
+
+  //  new expance
+  static async new_expense(req, res) {
+    const groupId = req.body.groupId;
+    const expanseType = req.body.expanseType;
+    const expanseDescription = req.body.expanseDescription;
+    const amount = req.body.amount;
+    const paidBy = req.body.paidBy;
+    const splitWith = req.body.splitWith;
+
+    const expenseInfo = new expenseModel({
+      groupId,
+      expanseType,
+      expanseDescription,
+      amount,
+      paidBy,
+      splitWith,
+    });
+
+    try {
+      const expanceResult = await expenseInfo.save();
+      res.status(200).json(expanceResult);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error });
+    }
+  }
+
+  static async get_expenceData(req, res) {
+    const groupId = mongoose.Types.ObjectId(req.query.groupId);
+    try {
+      const groupDateil = await groupModel.aggregate([
+        { $match: { _id: groupId } },
+        { $addFields: { _idStr: { $toString: "$_id" } } },
+        {
+          $lookup: {
+            from: "expenses",
+            localField: "_idStr",
+            foreignField: "groupId",
+            as: "expensesArr",
+          },
+        },
+        { $unwind: "$expensesArr" },
+      ]);
+
+      function handleMembers(groupMembers, splitWith) {
+        const membersArr = [];
+        splitWith.forEach((e, i) => {
+          const member = groupMembers.find(
+            (member) => member.userId === e.userId
+          );
+          membersArr.push({
+            id: e.userId,
+            name: member.name,
+            email: member.email,
+            amountLeft: e.amountLeft,
+          });
+        });
+        return membersArr;
+      }
+      function handlePaidBy(membersArr, paidBy) {
+        return membersArr.find((e) => e.userId == paidBy);
+      }
+
+      const groupExpenseData = [];
+      groupDateil.forEach((group) => {
+        const expenceData = {};
+        expenceData["memberArr"] = handleMembers(
+          group.membersArr,
+          group.expensesArr.splitWith
+        );
+        expenceData["expanseDescription"] =
+          group.expensesArr.expanseDescription;
+        expenceData["id"] = group.expensesArr._id;
+        expenceData["createdAt"] = group.expensesArr.createdAt;
+        expenceData["amount"] = group.expensesArr.amount;
+        expenceData["paidBy"] = handlePaidBy(
+          group.membersArr,
+          group.expensesArr.paidBy
+        );
+        groupExpenseData.push(expenceData);
+      });
+      res.status(200).json(groupExpenseData);
+    } catch (error) {
+      res.status(500).json(error);
+      console.log(error);
     }
   }
 }
