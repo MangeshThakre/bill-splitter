@@ -1,7 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 // icon
 import edit from "../../../asset/edit.svg";
@@ -10,13 +11,14 @@ import AddGroupPopUp from "../../popup/addGroupPopup/AddGroupPopUp";
 
 function RightSideBar({ currentGroup }) {
   const URL = process.env.REACT_APP_URL;
+  const EXPENSES = useSelector((state) => state.global.expenses);
 
   const [showAddGroupPopUp, setShowGroupPopUp] = useState(false);
   const [isMemberDetailLoading, setIsMemberDetailLoading] = useState(false);
 
   useEffect(() => {
     memberDetail();
-  }, [currentGroup]);
+  }, [EXPENSES]);
 
   async function memberDetail() {
     setIsMemberDetailLoading(true);
@@ -26,11 +28,13 @@ function RightSideBar({ currentGroup }) {
         url: URL + "/api/get_group_member_detail?groupId=" + currentGroup._id,
       });
       const data = response.data;
+      // console.log(data);
     } catch (error) {
       setIsMemberDetailLoading(false);
       console.log(error);
     }
   }
+
   return (
     <>
       <div className="w-80 h-full" aria-label="Sidebar">
@@ -46,7 +50,7 @@ function RightSideBar({ currentGroup }) {
 
           <div className="">
             <h1 className="font-bold text-gray-400 text-lg">GROUP BALANCE</h1>
-            <div>
+            <ul>
               {currentGroup.membersArr.map((e, i) => {
                 return (
                   <li key={i}>
@@ -64,7 +68,7 @@ function RightSideBar({ currentGroup }) {
                   </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         </div>
       </div>

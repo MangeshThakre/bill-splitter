@@ -6,6 +6,7 @@ export const globalSlice = createSlice({
     user: {},
     groups: [],
     friends: [],
+    expenses: [],
   },
 
   reducers: {
@@ -18,10 +19,13 @@ export const globalSlice = createSlice({
     friends: (state, action) => {
       state.friends = action.payload;
     },
+    expenses: (state, action) => {
+      state.expenses = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { user, groups, friends } = globalSlice.actions;
+export const { user, groups, friends, expenses } = globalSlice.actions;
 
 export default globalSlice.reducer;

@@ -1,36 +1,77 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { expenses } from "../../../redux/globalSplice.js";
+
 // popup
 import ChoosePayer from "./ChoosePayer.js";
 import SplitOptions from "./SplitOptions.js";
-
+import ChooseGroup from "./ChooseGroup.js";
 // image
 import Home from "../../../asset/home.jpg";
+import Other from "../../../asset/others.jpg";
+import Couple from "../../../asset/couple.jpg";
+import Trip from "../../../asset/trip.jpg";
+import axios from "axios";
 
 function AddExpencePopUp({
   showAddExpencePopUp,
   setShowAddExpencePopUp,
   currentGroup,
 }) {
+  const dispatch = useDispatch();
+  const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
+  const EXPENSES = useSelector((state) => state.global.expenses);
+  const [group, setGroup] = useState(currentGroup);
   // loadings
-  const [isSaveLoading, setIsSaveLoading] = useState(true);
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [SecondaryPopUp, setSecondaryPopUp] = useState(null);
   const [amount, setAmount] = useState("");
   //
   const [paidBy, setPaidBy] = useState({ name: "you", id: USER._id });
   const [splitWith, setSplitWith] = useState(
-    currentGroup.membersArr.map((e) => e.userId)
+    group.membersArr.map((e) => e.userId)
   );
 
-  console.log(splitWith);
-  console.log(amount / splitWith.length);
-  function handleAddExpanse(e) {
+  useEffect(() => setGroup(currentGroup), [currentGroup]);
+
+  function groupImg() {
+    if (group.groupType == "Home") return Home;
+    if (group.groupType == "Trip") return Trip;
+    if (group.groupType == "Couple") return Couple;
+    if (group.groupType == "Other") return Other;
+  }
+
+  async function handleAddExpanse(e) {
     e.preventDefault();
-    const expanceName = e.target[0].value;
-    console.table({ expanceName, amount, paidBy, splitWith });
-    console.log(amount / splitWith.length);
+    const expanseDescription = e.target[0].value;
+    setIsSaveLoading(true);
+    const splitWithArr = splitWith.map((e) => {
+      return { userId: e, amountLeft: Number(amount / splitWith.length) };
+    });
+
+    try {
+      const response = await axios({
+        method: "post",
+        url: URL + "/api/new_expense",
+        data: {
+          groupId: group._id,
+          expanseType: "GROUP",
+          expanseDescription,
+          amount,
+          paidBy: paidBy.id,
+          splitWith: splitWithArr,
+        },
+      });
+      const data = await response.data;
+      setShowAddExpencePopUp(false);
+      // dispatch(expenses([...EXPENSES, data]));
+    } catch (error) {
+      setIsSaveLoading(false);
+      console.log(error);
+      // alert(error);
+    }
   }
 
   return (
@@ -80,9 +121,9 @@ function AddExpencePopUp({
                 <form className="mt-6" onSubmit={(e) => handleAddExpanse(e)}>
                   <div className="flex gap-8">
                     <img
-                      src={Home}
+                      src={groupImg()}
                       className="w-24 h-24 rounded-lg  shadow-2xl"
-                      alt="home"
+                      alt={group.groupType}
                     />
                     <div className="flex flex-col gap-5">
                       <input
@@ -106,7 +147,7 @@ function AddExpencePopUp({
                   </div>
                   {/* info */}
                   <div className="flex justify-center items-center my-10 flex-col gap-3">
-                    <span>
+                    <span className="italic">
                       Paid by
                       <button
                         type="button"
@@ -129,17 +170,33 @@ function AddExpencePopUp({
                               : "SPLIT_OPTIONS"
                           )
                         }
-                        className="py-2 px-3 mx-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        className="py-2 px-3 ml-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                       >
                         equally
                       </button>
                       ​.
                     </span>
                     <span>
-                      {amount
-                        ? `(${amount / splitWith.length} / person)`
-                        : "(You owe nothing)"}
+                      {amount ? (
+                        <p className="font-medium text-gray-600 italic">
+                          ( &#x20b9; {(amount / splitWith.length).toFixed(2)} /
+                          person )
+                        </p>
+                      ) : (
+                        "(You owe nothing)"
+                      )}
                     </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSecondaryPopUp((perValue) =>
+                          perValue === "CHOOSE_GROUP" ? null : "CHOOSE_GROUP"
+                        )
+                      }
+                      className="py-2 px-3 ml-2 text-xs rounded-full font-medium text-center text-white bg-blue-700  hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                      {group.groupName}
+                    </button>
                   </div>
                   {/* button */}
                   <div className="flex gap-8 mt-8 justify-end pt-3 border-t-2 border-gray-300">
@@ -188,7 +245,7 @@ function AddExpencePopUp({
           {SecondaryPopUp == "CHOOSE_payer" ? (
             <ChoosePayer
               setSecondaryPopUp={setSecondaryPopUp}
-              members={currentGroup.membersArr}
+              members={group.membersArr}
               setPaidBy={setPaidBy}
               paidBy={paidBy}
             />
@@ -196,9 +253,16 @@ function AddExpencePopUp({
           {SecondaryPopUp == "SPLIT_OPTIONS" ? (
             <SplitOptions
               setSecondaryPopUp={setSecondaryPopUp}
-              members={currentGroup.membersArr}
+              members={group.membersArr}
               setSplitWith={setSplitWith}
               splitWith={splitWith}
+            />
+          ) : null}
+
+          {SecondaryPopUp === "CHOOSE_GROUP" ? (
+            <ChooseGroup
+              setSecondaryPopUp={setSecondaryPopUp}
+              setGroup={setGroup}
             />
           ) : null}
         </div>
