@@ -26,32 +26,37 @@ function GroupExpenceListItem({ expenseDetail }) {
 
   return (
     <div className="border-b-2 border-gray-300 ">
-      <div className="py-2 px-4 bg-slate-200 cursor-pointer flex justify-between">
+      {/* head */}
+      <div className="py-2 px-6  mx-1 bg-gray-200 hover:bg-blue-100 cursor-pointer flex justify-between">
+        {/* left */}
         <div className="flex gap-3 items-center">
           <span>
-            <p className="font-semibold text-3xl">{expanceDate}</p>
+            <p className="font-semibold text-xl">{expanceDate}</p>
             <p>{mounth}</p>
           </span>
-          <p className="ml-5 text-xl font-bold">
+          <p className="ml-5 text-lg font-semibold">
             {expenseDetail.expanseDescription}
           </p>
         </div>
-        <div className="flex items-center gap-10">
-          <div>
+        <div className="flex items-center gap-5">
+          {/* right */}
+          <div className=" w-32">
             <p className="    text-gray ">{handlePaidBy()} paid </p>
-            <p className="text-2xl font-semibold">
+            <p className="text-xl font-semibold">
               &#x20b9; {expenseDetail.amount}
             </p>
           </div>
-          <div>
+          <div className="w-32">
             <p className="text-gray ">{handlePaidBy()} lent </p>
-            <p className="text-2xl font-semibold">
+            <p className="text-xl font-semibold">
               &#x20b9; {handleLentMoney()}
             </p>
           </div>
           <div>button</div>
         </div>
       </div>
+      {/* body */}
+      <div></div>
     </div>
   );
 }

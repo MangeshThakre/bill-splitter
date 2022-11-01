@@ -12,7 +12,7 @@ const expenseSchema = new Schema(
       new Schema(
         {
           userId: { type: String, required: true },
-          amountLeft: { type: String, required: true },
+          amountLeft: { type: Number, required: true },
         },
         { _id: false }
       ),

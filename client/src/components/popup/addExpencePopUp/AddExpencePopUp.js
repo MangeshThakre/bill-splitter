@@ -25,7 +25,7 @@ function AddExpencePopUp({
   const EXPENSES = useSelector((state) => state.global.expenses);
   const [group, setGroup] = useState(currentGroup);
   // loadings
-  const [isSaveLoading, setIsSaveLoading] = useState(false);
+  const [isSaveExpenceLoading, setIsSaveExpenceLoading] = useState(false);
   const [SecondaryPopUp, setSecondaryPopUp] = useState(null);
   const [amount, setAmount] = useState("");
   //
@@ -43,10 +43,12 @@ function AddExpencePopUp({
     if (group.groupType == "Other") return Other;
   }
 
+  // console.log(isSaveLoading);
+
   async function handleAddExpanse(e) {
     e.preventDefault();
     const expanseDescription = e.target[0].value;
-    setIsSaveLoading(true);
+    setIsSaveExpenceLoading(true);
     const splitWithArr = splitWith.map((e) => {
       return { userId: e, amountLeft: Number(amount / splitWith.length) };
     });
@@ -67,8 +69,9 @@ function AddExpencePopUp({
       const data = await response.data;
       setShowAddExpencePopUp(false);
       // dispatch(expenses([...EXPENSES, data]));
+      setIsSaveExpenceLoading(false);
     } catch (error) {
-      setIsSaveLoading(false);
+      setIsSaveExpenceLoading(false);
       console.log(error);
       // alert(error);
     }
@@ -216,7 +219,7 @@ function AddExpencePopUp({
                       className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
                     >
                       Save
-                      {isSaveLoading ? (
+                      {isSaveExpenceLoading ? (
                         <svg
                           aria-hidden="true"
                           role="status"

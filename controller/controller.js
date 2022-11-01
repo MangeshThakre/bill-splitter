@@ -177,11 +177,24 @@ class controller {
   // groupMemberDetail
   static async get_group_member_detail(req, res) {
     const groupId = mongoose.Types.ObjectId(req.query.groupId);
+    const userId = mongoose.Types.ObjectId(req.query.userId);
     try {
-      const groupDateil = await groupModel.aggregate([
+      const [groupMemberDetail] = await groupModel.aggregate([
         { $match: { _id: groupId } },
         { $addFields: { _idStr: { $toString: "$_id" } } },
+        { $addFields: { userIdStr: { $toString: userId } } },
         {
+          // join friends collection
+          $lookup: {
+            from: "friends",
+            localField: "userIdStr",
+            foreignField: "userId",
+            as: "freinds",
+          },
+        },
+        { $unwind: "$freinds" },
+        {
+          // join friends collection
           $lookup: {
             from: "expenses",
             localField: "_idStr",
@@ -189,41 +202,85 @@ class controller {
             as: "expensesArr",
           },
         },
-        { $unwind: "$expensesArr" },
+        {
+          $project: {
+            _id: 0,
+            groupId: "$_id",
+            membersArr: "$membersArr",
+            friends: "$freinds",
+            expensesArr: "$expensesArr",
+          },
+        },
       ]);
 
-      function handleMembers(groupMembers, splitWith) {
-        const membersArr = [];
-        splitWith.forEach((e, i) => {
-          const member = groupMembers.find(
-            (member) => member.userId === e.userId
-          );
-          membersArr.push({
-            id: e.userId,
-            name: member.name,
-            email: member.email,
-            amountLeft: e.amountLeft,
-          });
+      const friends = groupMemberDetail.friends;
+      const expensesArr = groupMemberDetail.expensesArr;
+
+      function handleMember(currentMemberExpenseArr, currentMember) {
+        const member = {};
+        friends.friendsArr.forEach((friend) => {
+          if (
+            friend.userId == currentMember.userId &&
+            friend.userId != userId
+          ) {
+            member["name"] = friend.name;
+            member["id"] = friend.userId;
+            member["email"] = friend.email;
+            return;
+          } else if (friend.userId == userId) {
+            member["name"] = friends.name;
+            member["id"] = friends.userId;
+            member["email"] = friends.email;
+            return;
+          }
         });
-        return membersArr;
+        let transection = [];
+        currentMemberExpenseArr.forEach((expense) => {
+          const obj = {};
+          if (expense.paidBy === currentMember.userId) {
+            const splitWithMember = expense.splitWith.filter(
+              ({ userId }) => currentMember.userId !== userId
+            );
+            obj["owed"] = [];
+            obj["groupId"] = expense.groupId;
+            splitWithMember.forEach((e) =>
+              obj["owed"].push({
+                userId: expense.paidBy,
+                amount: e.amountLeft,
+              })
+            );
+          } else {
+            const splitWithMember = expense.splitWith.find(
+              ({ userId }) => currentMember.userId == userId
+            );
+            obj["groupId"] = expense.groupId;
+            obj["owe"] = {
+              userId: expense.paidBy,
+              amount: splitWithMember.amountLeft,
+            };
+          }
+          transection.push(obj);
+        });
+        member["transection"] = transection;
+        // console.log(currentMemberExpenseArr);
+        return member;
       }
-      const groupExpenseData = [];
-      groupDateil.forEach((group) => {
-        const expenceData = {};
-        expenceData["memberArr"] = handleMembers(
-          group.membersArr,
-          group.expensesArr.splitWith
+
+      function handleMembersDetailArr(member) {
+        const currentMemberExpenseArr = expensesArr.filter(({ splitWith }) =>
+          splitWith.some(({ userId }) => userId === member.userId)
         );
-        expenceData["expanseDescription"] =
-          group.expensesArr.expanseDescription;
-        expenceData["id"] = group.expensesArr._id;
-        expenceData["createdAt"] = group.expensesArr.createdAt;
-        expenceData["amount"] = group.expensesArr.amount;
-        expenceData["paidBy"] = group.expensesArr.paidBy;
-        groupExpenseData.push(expenceData);
+        return handleMember(currentMemberExpenseArr, member);
+      }
+
+      const membersDetailArr = [];
+      groupMemberDetail.membersArr.forEach((member) => {
+        membersDetailArr.push(handleMembersDetailArr(member));
       });
 
-      res.status(200).json(groupExpenseData);
+      console.log(membersDetailArr);
+
+      res.status(200).json({ membersDetailArr: membersDetailArr });
     } catch (error) {
       res.status(500).json(error);
       console.log(error);
@@ -257,6 +314,7 @@ class controller {
     }
   }
 
+  // get group expence data
   static async get_expenceData(req, res) {
     const groupId = mongoose.Types.ObjectId(req.query.groupId);
     try {
