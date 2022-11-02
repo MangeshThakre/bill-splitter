@@ -18,6 +18,7 @@ function AddExpencePopUp({
   showAddExpencePopUp,
   setShowAddExpencePopUp,
   currentGroup,
+  setReloadGroupExpenseData,
 }) {
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
@@ -29,10 +30,15 @@ function AddExpencePopUp({
   const [SecondaryPopUp, setSecondaryPopUp] = useState(null);
   const [amount, setAmount] = useState("");
   //
-  const [paidBy, setPaidBy] = useState({ name: "you", id: USER._id });
+  const [paidBy, setPaidBy] = useState({ name: "you", email: USER.email });
+
   const [splitWith, setSplitWith] = useState(
-    group.membersArr.map((e) => e.userId)
+    group.membersArr.map((e) => e.email)
   );
+
+  useEffect(() => {
+    setSplitWith(group.membersArr.map((e) => e.email));
+  }, [group]);
 
   useEffect(() => setGroup(currentGroup), [currentGroup]);
 
@@ -50,9 +56,12 @@ function AddExpencePopUp({
     const expanseDescription = e.target[0].value;
     setIsSaveExpenceLoading(true);
     const splitWithArr = splitWith.map((e) => {
-      return { userId: e, amountLeft: Number(amount / splitWith.length) };
+      return {
+        email: e,
+        amountLeft: Number(amount / splitWith.length),
+        isSettled: false,
+      };
     });
-
     try {
       const response = await axios({
         method: "post",
@@ -62,13 +71,13 @@ function AddExpencePopUp({
           expanseType: "GROUP",
           expanseDescription,
           amount,
-          paidBy: paidBy.id,
+          paidBy: paidBy.email,
           splitWith: splitWithArr,
         },
       });
       const data = await response.data;
       setShowAddExpencePopUp(false);
-      // dispatch(expenses([...EXPENSES, data]));
+      setReloadGroupExpenseData((prevVal) => !prevVal);
       setIsSaveExpenceLoading(false);
     } catch (error) {
       setIsSaveExpenceLoading(false);

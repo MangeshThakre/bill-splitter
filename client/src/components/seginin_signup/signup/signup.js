@@ -21,7 +21,7 @@ function Signup() {
     const lastName = e.target[1].value;
     const phoneNo = Number(e.target[2].value);
     const email = e.target[3].value;
-    const passWord = md5(e.target[4].value);
+    const passWord = e.target[4].value;
     try {
       setIsLoading(true);
       const response = await axios({
@@ -41,7 +41,7 @@ function Signup() {
     }
   }
 
-  function google() {
+  async function google() {
     window.open(URL + "/auth/google/callback", "_self");
   }
 

@@ -4,6 +4,7 @@ const cors = require("cors");
 const passport = require("passport");
 const router = require("./router/router.js");
 const authRoute = require("./router/auth.js");
+const path = require("path");
 
 const expressSession = require("express-session");
 const { route } = require("./router/router.js");
@@ -14,8 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    origin: ["http://localhost:3000", "http://localhost:8081"],
+    methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
     credentials: true,
   })
 );
@@ -62,9 +63,21 @@ app.use(passport.session());
 //   next();
 // });
 
-//  router
-app.use("/auth", authRoute);
-app.use("/api", router);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+  //  router
+  app.use("/auth", authRoute);
+  app.use("/api", router);
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("app is runing successfully");
+  });
+  app.use("/auth", authRoute);
+  app.use("/api", router);
+}
 
 app.use((err, req, res, dome) => {
   if (err) console.log("server.js", err);

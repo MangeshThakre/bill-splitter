@@ -210,8 +210,10 @@ function AddGroupPopUp({
       type="email"
       id="groupMemberEmail"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      placeholder="email@.com  ( optional )"
+      placeholder="email@.com  ( required )"
       name =${memberNo + "_email"}
+      required
+
     />
     
     <button
@@ -281,13 +283,9 @@ function AddGroupPopUp({
         url: URL + "/api/create_group",
         data: { creator, groupName, membersArr, groupType },
       });
-
-      const { groupResult, friendsArr } = await response.data;
-
+      const { groupResult } = await response.data;
       // add group and update griends in readux
       dispatch(groups([...GROUPS, groupResult]));
-      dispatch(friends([...FRIENDS, ...friendsArr]));
-
       setIsSaveLoading(false);
       setShowGroupPopUp(false);
       navigate(`/group/${groupResult._id}`);
@@ -340,8 +338,31 @@ function AddGroupPopUp({
 
   // delete group
   async function handleDelete() {
-    setIsDeleteLoading(false);
+    setIsDeleteLoading(true);
+    try {
+      const deleteResponse = await axios({
+        method: "delete",
+        url: URL + "/api/delete_group?groupId=" + currentGroup._id,
+      });
+      const { data } = deleteResponse.data;
+      if (data === "deleted") {
+        const updatedGroup = GROUPS.filter(
+          ({ _id }) => _id !== currentGroup._id
+        );
+
+        setShowGroupPopUp(false);
+        navigate("/dashbord");
+        dispatch(groups(updatedGroup));
+      }
+
+      setIsDeleteLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsDeleteLoading(false);
+    }
   }
+
+  // console.log(USER.email === currentGroup.creator.email ? false : true);
 
   return (
     <>
@@ -483,7 +504,8 @@ function AddGroupPopUp({
                                 type="email"
                                 id="groupMemberEmail"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="email@.com ( optional )"
+                                placeholder="email@.com ( required )"
+                                required
                                 onChange={(e) => handleEmailInput(e.target)}
                               />
                               <button
@@ -537,6 +559,7 @@ function AddGroupPopUp({
                                   <input
                                     type="email"
                                     id="groupMemberEmail"
+                                    required
                                     style={{
                                       backgroundColor:
                                         member.name && member.email
@@ -544,7 +567,7 @@ function AddGroupPopUp({
                                           : "#f9fafb",
                                     }}
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    placeholder="email@.com"
+                                    placeholder="email@.com (required)"
                                     onChange={(e) => handleEmailInput(e.target)}
                                     defaultValue={member.email}
                                     disabled={member.name && member.email}
@@ -564,13 +587,22 @@ function AddGroupPopUp({
 
                         {/*  remaining dynamic */}
                       </ul>
-                      <div
+                      <button
                         id="addPersion"
                         onClick={() => handleAddGroupMember()}
-                        className="my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                        disabled={
+                          USER.email === currentGroup.creator.email
+                            ? false
+                            : true
+                        }
+                        className={
+                          USER.email === currentGroup.creator.email
+                            ? "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                            : "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                        }
                       >
                         + Add a persion
-                      </div>
+                      </button>
                     </div>
                     {/* group type */}
                     <div>
@@ -629,6 +661,11 @@ function AddGroupPopUp({
                       {/*   update / save button   */}
                       <button
                         type="submit"
+                        disabled={
+                          USER.email === currentGroup.creator.email
+                            ? false
+                            : true
+                        }
                         className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
                       >
                         {isEdit ? "Update" : "Save"}
@@ -657,6 +694,11 @@ function AddGroupPopUp({
                       {isEdit ? (
                         <button
                           type="button"
+                          disabled={
+                            USER.email === currentGroup.creator.email
+                              ? false
+                              : true
+                          }
                           onClick={() => handleDelete()}
                           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         >

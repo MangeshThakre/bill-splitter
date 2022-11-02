@@ -16,6 +16,7 @@ function ChooseGroup({ setSecondaryPopUp, group, setGroup }) {
   function handleSelectGroup(group) {
     setGroup(GROUPS.find((e) => e._id === group._id));
   }
+
   return (
     <div className="relative p-4 w-full max-w-md h-full md:h-auto">
       <div className=" bg-white rounded-lg shadow dark:bg-gray-700">

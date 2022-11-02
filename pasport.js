@@ -47,7 +47,7 @@ const verifyLocalStrategy = async function (req, email, password, done) {
     if (isValid) {
       return done(null, user);
     } else {
-      return done({ message: "Invalid  password." });
+      return done(null, { error: true, message: "Invalid  password." });
     }
   } catch (error) {
     done(null, false, { message: error.message });
@@ -96,6 +96,7 @@ passport.use(
             created_at: new Date(),
           });
           const result = await saveUserInfo.save();
+
           return done(null, result);
         }
       } catch (error) {

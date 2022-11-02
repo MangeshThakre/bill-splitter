@@ -18,7 +18,7 @@ function Signin({ setAlertPopUp }) {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
-
+    console.log(password);
     const response = await axios({
       method: "post",
       url: URL + "/auth/signin",

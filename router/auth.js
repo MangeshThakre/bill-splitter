@@ -31,7 +31,6 @@ router.post("/signin", passport.authenticate("local"), authcontroller.singIn);
 // google-statergy
 router.get("/google", passport.authenticate("google", ["profile", "email"]));
 
-
 router.get(
   "/google/callback",
   passport.authenticate("google", {

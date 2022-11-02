@@ -11,8 +11,9 @@ const expenseSchema = new Schema(
     splitWith: [
       new Schema(
         {
-          userId: { type: String, required: true },
+          email: { type: String, required: true },
           amountLeft: { type: Number, required: true },
+          isSettled: { type: Boolean, required: true },
         },
         { _id: false }
       ),

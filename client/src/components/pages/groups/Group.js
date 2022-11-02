@@ -24,7 +24,7 @@ function Group() {
   const GROUPS = useSelector((state) => state.global.groups);
   const EXPENSES = useSelector((state) => state.global.expenses);
   const currentGroup = GROUPS.find((e) => e._id === id);
-  const [groupExpenseData, setGroupExpenseData] = useState([]);
+  const [reloadGroupExpenseData, setReloadGroupExpenseData] = useState(false);
   // loading
   const [isGroupInfoLoading, setIsGroupInfoLoading] = useState(false);
   // expanse popup toggle
@@ -38,7 +38,7 @@ function Group() {
 
   useEffect(() => {
     handleExpanseData();
-  }, [currentGroup]);
+  }, [currentGroup, reloadGroupExpenseData]);
 
   async function handleExpanseData() {
     setIsGroupInfoLoading(true);
@@ -79,17 +79,10 @@ function Group() {
           >
             Add expanse
           </button>
-          {/* settle up button */}
-          <button
-            type="button"
-            className="text-white bg-[#2557D6] hover:bg-[#2557D6]/90 focus:ring-4 focus:ring-[#2557D6]/50 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#2557D6]/50 "
-          >
-            settle up
-          </button>
         </div>
         {/* header end */}
         {/* body */}
-        <div className="basis-full">
+        <div className="basis-full overflow-y-auto">
           {isGroupInfoLoading ? (
             <div className="h-full flex justify-center items-center">
               <img src={loading} alt="loading" />
@@ -100,7 +93,10 @@ function Group() {
                 EXPENSES.map((expense, i) => {
                   return (
                     <li key={i}>
-                      <GroupExpenceListItem expenseDetail={expense} />
+                      <GroupExpenceListItem
+                        expenseDetail={expense}
+                        groupCreatorEmail={currentGroup.creator.email}
+                      />
                     </li>
                   );
                 })
@@ -118,6 +114,7 @@ function Group() {
         showAddExpencePopUp={showAddExpencePopUp}
         setShowAddExpencePopUp={setShowAddExpencePopUp}
         currentGroup={currentGroup}
+        setReloadGroupExpenseData={setReloadGroupExpenseData}
       />
     </>
   );

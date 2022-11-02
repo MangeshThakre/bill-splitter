@@ -10,37 +10,9 @@ import AddGroupPopUp from "../../popup/addGroupPopup/AddGroupPopUp";
 // list
 
 function RightSideBar({ currentGroup }) {
-  const URL = process.env.REACT_APP_URL;
-  const USER = useSelector((state) => state.global.user);
-  const EXPENSES = useSelector((state) => state.global.expenses);
-
   const [showAddGroupPopUp, setShowGroupPopUp] = useState(false);
-  const [isMemberDetailLoading, setIsMemberDetailLoading] = useState(false);
 
-  const [membersDetailArr, setMembersDetailArr] = useState([]);
-  useEffect(() => {
-    memberDetail();
-  }, [EXPENSES]);
-
-  async function memberDetail() {
-    setIsMemberDetailLoading(true);
-    try {
-      const response = await axios({
-        method: "get",
-        url:
-          URL +
-          "/api/get_group_member_detail?groupId=" +
-          currentGroup._id +
-          "&userId=" +
-          USER._id,
-      });
-      const data = response.data;
-      // console.log(data);
-    } catch (error) {
-      setIsMemberDetailLoading(false);
-      console.log(error);
-    }
-  }
+  // console.log(membersDetailArr);
 
   return (
     <>
