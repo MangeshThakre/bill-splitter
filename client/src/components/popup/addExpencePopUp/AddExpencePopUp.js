@@ -59,7 +59,7 @@ function AddExpencePopUp({
       return {
         email: e,
         amountLeft: Number(amount / splitWith.length),
-        isSettled: false,
+        isSettled: e == paidBy.email ? true : false,
       };
     });
     try {

@@ -348,6 +348,7 @@ class controller {
     const amount = req.body.amount;
     const paidBy = req.body.paidBy;
     const splitWith = req.body.splitWith;
+    // console.log(paidBy);
     const expenseInfo = new expenseModel({
       groupId,
       expanseType,
@@ -356,6 +357,7 @@ class controller {
       paidBy,
       splitWith,
     });
+
     try {
       const expanceResult = await expenseInfo.save();
       res.status(200).json(expanceResult);

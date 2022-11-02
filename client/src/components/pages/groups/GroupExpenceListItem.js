@@ -10,32 +10,33 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
   const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
   const [showBody, setShowBody] = useState(false);
-  const [currentExpenceDetail, setCurrentExpenceDetail] =
-    useState(expenseDetail);
-  const date = new Date(currentExpenceDetail.createdAt);
+
+  const [currentExpenceMemberArr, setCurrentExpenceMemberArr] = useState(
+    expenseDetail.memberArr
+  );
+  const date = new Date(expenseDetail.createdAt);
   const mounth = date.toLocaleString("default", { month: "long" });
-  const expanceDate = new Date(currentExpenceDetail.createdAt).getDate();
+  const expanceDate = new Date(expenseDetail.createdAt).getDate();
 
   // loading
   const [isSettleExpenseLoading, setSettleExpenseLoading] = useState(false);
-
   // handle paid name
   function handlePaidBy() {
-    let paidByName = currentExpenceDetail.paidBy.name;
+    let paidByName = expenseDetail.paidBy.name;
     if (paidByName.split(" ").length > 1) {
       paidByName =
-        currentExpenceDetail.paidBy.name.split(" ")[0] +
+        expenseDetail.paidBy.name.split(" ")[0] +
         " " +
-        currentExpenceDetail.paidBy.name.split(" ")[1][0] +
+        expenseDetail.paidBy.name.split(" ")[1][0] +
         ".";
     }
-    if (currentExpenceDetail.paidBy.email === USER.email) return "You";
+    if (expenseDetail.paidBy.email === USER.email) return "You";
     else return paidByName;
   }
 
   function handleLentMoney() {
-    return currentExpenceDetail.memberArr.reduce((acc, crr) => {
-      if (crr.email !== currentExpenceDetail.paidBy.email) {
+    return currentExpenceMemberArr.reduce((acc, crr) => {
+      if (crr.email !== expenseDetail.paidBy.email) {
         acc = acc + Number(crr.amountLeft);
       }
       return acc;
@@ -44,10 +45,10 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
 
   // settle button
   function handledIsSettelButton() {
-    const currentMember = currentExpenceDetail.memberArr.find(
+    const currentMember = currentExpenceMemberArr.find(
       (e) => e.email === USER.email
     );
-    if (USER.email !== currentExpenceDetail.paidBy.email) {
+    if (USER.email !== expenseDetail.paidBy.email) {
       if (currentMember && !currentMember.isSettled) return "settle";
       else if (currentMember && currentMember.isSettled) return "settled";
       else return false;
@@ -68,7 +69,20 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
           userEmail,
       });
       const data = await response.data;
-      setCurrentExpenceDetail(data);
+
+      const newCurrentExpenceMemberArr = currentExpenceMemberArr.map((e) => {
+        return {
+          amountLeft: e.amountLeft,
+          email: e.email,
+          isSettled: data.splitWith.find((member) => member.email == e.email)
+            .isSettled,
+          name: e.name,
+        };
+      });
+      // console.log(newCurrentExpenceMemberArr);
+
+      setCurrentExpenceMemberArr(newCurrentExpenceMemberArr);
+
       setSettleExpenseLoading(false);
     } catch (error) {
       setSettleExpenseLoading(false);
@@ -125,15 +139,15 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
             <p>{mounth}</p>
           </span>
           <p className="ml-5 text-lg font-semibold">
-            {currentExpenceDetail.expanseDescription}
+            {expenseDetail.expanseDescription}
           </p>
         </div>
+        {/* right */}
         <div className="flex items-center gap-5">
-          {/* right */}
           <div className=" w-32">
             <p className="    text-gray ">{handlePaidBy()} paid </p>
             <p className="text-xl font-semibold">
-              &#x20b9; {currentExpenceDetail.amount.toFixed(2)}
+              &#x20b9; {expenseDetail.amount.toFixed(2)}
             </p>
           </div>
           <div className="w-32">
@@ -149,15 +163,17 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
       {showBody ? (
         <div className="px-5 flex justify-between items-end">
           <ul className="w-[40%]">
-            {currentExpenceDetail.memberArr.map((member, i) => {
+            {currentExpenceMemberArr.map((member, i) => {
               return (
                 <li className="my-3 flex w-full justify-between" key={i}>
+                  {/* list left */}
                   <div>
                     <p className="mr-4 text-xl">{member.name}</p>
                     <span>
-                      {member.email == currentExpenceDetail.paidBy.email ? (
+                      {member.email == expenseDetail.paidBy.email ? (
                         <span className="italic font-semibold">
-                          paid &#x20b9;{currentExpenceDetail.amount.toFixed(2)}
+                          paid &#x20b9;
+                          {expenseDetail.amount.toFixed(2)}
                         </span>
                       ) : (
                         <span className="italic font-semibold  text-gray-600 ">
@@ -166,14 +182,18 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
                       )}
                     </span>
                   </div>
+                  {/* list reight */}
                   <div className="w-[6rem] text-center">
-                    {groupCreatorEmail == USER.email &&
-                    groupCreatorEmail !== member.email &&
+                    {/* settel button */}
+                    {member.email !== USER.email && // from current user
+                    USER.email == expenseDetail.paidBy.email &&
                     !member.isSettled
-                      ? settleButton(currentExpenceDetail.id, member.email)
+                      ? settleButton(expenseDetail.id, member.email)
                       : null}
 
-                    {member.isSettled ? (
+                    {/* settled message */}
+                    {expenseDetail.paidBy.email !== member.email &&
+                    member.isSettled ? (
                       <span className="text-gray-600   font-semibold">
                         ✅ Settled
                       </span>
@@ -185,12 +205,13 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
           </ul>
           <div className="h-full flex items-center">
             {handledIsSettelButton() == "settle"
-              ? settleButton(currentExpenceDetail.id, USER.email)
+              ? settleButton(expenseDetail.id, USER.email)
               : null}
             `
           </div>
         </div>
       ) : null}
+      {/* body end */}
     </div>
   );
 }

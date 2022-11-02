@@ -9,12 +9,12 @@ function ChoosePayer({ setSecondaryPopUp, members, setPaidBy }) {
     if (e.name.split(" ") > 1) {
       setPaidBy({
         name: e.name.split(" ")[0] + " " + e.name.split(" ")[1][0],
-        id: e.userId,
+        email: e.email,
       });
     } else {
       setPaidBy({
         name: e.name,
-        id: e.userId,
+        email: e.email,
       });
     }
     setSecondaryPopUp(false);
