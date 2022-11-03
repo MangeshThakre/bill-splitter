@@ -18,6 +18,8 @@ router.post("/new_expense", controller.new_expense);
 
 router.post("/create_group", controller.create_group);
 
+router.post("/add_friend", controller.add_friend);
+
 // UPDATE
 
 router.put("/settle_expense", controller.settle_expense);

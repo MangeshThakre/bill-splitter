@@ -16,6 +16,7 @@ import Dashbord from "./components/pages/dashbord/Dashbord.js";
 import AllExpense from "./components/pages/allExpenses/AllExpense";
 import RecentAcitvity from "./components/pages/recentAcitvity/RecentAcitvity";
 import Group from "./components/pages/groups/Group.js";
+import Friend from "./components/pages/friends/Friends.js";
 
 import { useNavigate } from "react-router-dom";
 function App() {
@@ -80,6 +81,8 @@ function App() {
                   <Route path="/users" element={<UserPage />} />
                   <Route path="/all-expenses" element={<UserPage />} />
                   <Route path="/group/:id" element={<Group />} />
+                  <Route path="/friend/:email" element={<Friend />} />
+
                   <Route path="*" element={<div>page not found</div>} />
                 </Routes>
               </div>

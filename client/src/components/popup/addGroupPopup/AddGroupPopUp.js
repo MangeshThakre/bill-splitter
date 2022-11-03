@@ -591,12 +591,12 @@ function AddGroupPopUp({
                         id="addPersion"
                         onClick={() => handleAddGroupMember()}
                         disabled={
-                          USER.email === currentGroup.creator.email
+                          isEdit && USER.email === currentGroup.creator.email
                             ? false
                             : true
                         }
                         className={
-                          USER.email === currentGroup.creator.email
+                          isEdit && USER.email === currentGroup.creator.email
                             ? "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                             : "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                         }
@@ -662,7 +662,7 @@ function AddGroupPopUp({
                       <button
                         type="submit"
                         disabled={
-                          USER.email === currentGroup.creator.email
+                          isEdit && USER.email === currentGroup.creator.email
                             ? false
                             : true
                         }

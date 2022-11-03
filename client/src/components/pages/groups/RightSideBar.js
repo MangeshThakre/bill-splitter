@@ -1,23 +1,23 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
 import { useSelector } from "react-redux";
 
 // icon
 import edit from "../../../asset/edit.svg";
+import person from "../../../asset/persion.png";
 import AddGroupPopUp from "../../popup/addGroupPopup/AddGroupPopUp";
-// list
+
+// listComponent
+import GroupMemberList from "./GroupMemberList.js";
 
 function RightSideBar({ currentGroup }) {
   const [showAddGroupPopUp, setShowGroupPopUp] = useState(false);
-
-  // console.log(membersDetailArr);
 
   return (
     <>
       <div className="w-80 h-full" aria-label="Sidebar">
         <div className="overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800 h-full ">
+          {/* edit group button */}
           <div
             onClick={() => setShowGroupPopUp(true)}
             id="header"
@@ -26,24 +26,15 @@ function RightSideBar({ currentGroup }) {
             <img src={edit} className="w-10 h-10 ml-4" alt="edit" />
             <p className="font-bold text-gray-400">Edit group settings</p>
           </div>
+          {/* edit group button  exit*/}
 
           <div className="">
-            <h1 className="font-bold text-gray-400 text-lg">GROUP BALANCE</h1>
+            <h1 className="font-bold text-gray-400 text-lg">GROUP MEMBERS</h1>
             <ul>
               {currentGroup.membersArr.map((e, i) => {
                 return (
                   <li key={i}>
-                    <Link
-                      // to={"/group/" + e._id + "/edit"}
-                      className="flex gap-3 items-center p-2 pl-3 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    >
-                      <img
-                        //   src={groupImg(e.groupType)}
-                        className="w-8 h-8 rounded-full"
-                        alt="img"
-                      />
-                      <p className="font-semibold text-gray-600">{e.name}</p>
-                    </Link>
+                    <GroupMemberList currentMember={e} />
                   </li>
                 );
               })}
