@@ -37,6 +37,7 @@ function AddGroupExpencePopUp({
   );
 
   useEffect(() => {
+    setPaidBy({ name: "you", email: USER.email });
     setSplitWith(group.membersArr.map((e) => e.email));
   }, [group]);
 

@@ -443,6 +443,91 @@ class controller {
     }
   }
 
+  static async get_private_expenseData(req, res) {
+    const userEmail = req.query.user;
+    const friendEmail = req.query.friend;
+    const userId = req.query.userId;
+
+    console.log(userEmail, friendEmail);
+
+    // const friendDetaie = await expenseModel.aggregate([
+    //   {
+    //     $match: {
+    //       expenseType: "PRIVATE",
+    //       "splitWith.email": friendEmail,
+    //       "splitWith.email": userEmail,
+    //     },
+    //   },
+    // ]);
+    // console.log(friendDetaie);
+
+    try {
+      const friendDetail = await expenseModel.aggregate([
+        { $match: { expenseType: "PRIVATE" } },
+        { $match: { "splitWith.email": friendEmail } },
+        { $match: { "splitWith.email": userEmail } },
+
+        { $addFields: { userId: userId } },
+        {
+          $lookup: {
+            from: "friends",
+            localField: "userId",
+            foreignField: "userId",
+            as: "friends",
+          },
+        },
+        { $unwind: "$friends" },
+        // { $unwind: "$friends.friendsArr" },
+      ]);
+      function handleMembers(groupMembers, splitWith) {
+        const membersArr = [];
+        splitWith.forEach((e, i) => {
+          const member = groupMembers.find((member) => member.email == e.email);
+          membersArr.push({
+            id: e.email,
+            name: member ? member.name : e.name,
+            email: member ? member.email : e.email,
+            amountLeft: e.amountLeft,
+            isSettled: e.isSettled,
+          });
+        });
+        return membersArr;
+      }
+      function handlePaidBy(membersArr, splitWith, paidBy) {
+        const member = membersArr.find((e) => e.email == paidBy);
+        if (member) return member;
+        else {
+          const paidmember = splitWith.find((e) => e.email == paidBy);
+          return { name: paidmember.name, email: paidmember.email };
+        }
+      }
+
+      const friendExpenseData = [];
+      friendDetail.forEach((group) => {
+        const expenceData = {};
+        expenceData["memberArr"] = handleMembers(
+          group.friends.friendsArr,
+          group.splitWith
+        );
+        expenceData["expanseDescription"] = group.expanseDescription;
+        expenceData["createdAt"] = group.createdAt;
+        expenceData["amount"] = group.amount;
+        expenceData["id"] = group._id;
+        expenceData["paidBy"] = handlePaidBy(
+          group.friends.friendsArr,
+          group.splitWith,
+          group.paidBy
+        );
+        friendExpenseData.push(expenceData);
+      });
+
+      res.status(200).json(friendExpenseData);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   // settle_expense
   static async settle_expense(req, res) {
     const expenseId = req.query.expenseId;

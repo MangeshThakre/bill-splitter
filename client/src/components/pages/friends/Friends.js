@@ -1,18 +1,58 @@
 import person from "../../../asset/persion.png";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, dispatch, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
+import { expenses } from "../../../redux/globalSplice.js";
+
+import axios from "axios";
 // component
 import RightSideBar from "./RightSideBar";
 import AddFriendExpensePopUp from "../../popup/addExpencePopUp/AddFriendExpensePopUp";
+import GroupExpenceListItem from "../../../components/pages/groups/GroupExpenceListItem.js";
+
+// image
+import loading from "../../../asset/loading.svg";
 
 function Friends() {
+  const dispatch = useDispatch();
   const { email } = useParams();
+  const URL = process.env.REACT_APP_URL;
+  const USER = useSelector((state) => state.global.user);
   const FRIENDS = useSelector((state) => state.global.friends);
+  const EXPENSES = useSelector((state) => state.global.expenses);
+
   const [showAddFriendExpencePopUp, setShowAddFriendExpencePopUp] =
     useState(false);
   const [reloadExpenseDate, setReloadExpenseData] = useState(false);
+  const [isFriendInfoLoading, setIsFriendInfoLoading] = useState(false);
   const currentFriend = FRIENDS.find((e) => e.email == email);
+
+  useEffect(() => {
+    handleExpanseData();
+  }, [currentFriend, reloadExpenseDate]);
+
+  async function handleExpanseData() {
+    setIsFriendInfoLoading(true);
+    try {
+      const response = await axios({
+        method: "get",
+        url:
+          URL +
+          "/api/get_private_expenseData?user=" +
+          USER.email +
+          "&userId=" +
+          USER._id +
+          "&friend=" +
+          currentFriend.email,
+      });
+      const data = await response.data;
+      dispatch(expenses(data));
+      setIsFriendInfoLoading(false);
+    } catch (error) {
+      setIsFriendInfoLoading(false);
+      alert(error);
+    }
+  }
 
   return (
     <>
@@ -33,6 +73,33 @@ function Friends() {
           </button>
         </div>
         {/* header end */}
+        {/* body */}
+        <div className="basis-full overflow-y-auto">
+          {isFriendInfoLoading ? (
+            <div className="h-full flex justify-center items-center">
+              <img src={loading} alt="loading" />
+            </div>
+          ) : (
+            <ul className="mt-2">
+              {EXPENSES ? (
+                EXPENSES.map((expense, i) => {
+                  return (
+                    <li key={i}>
+                      <GroupExpenceListItem
+                        expenseDetail={expense}
+                        groupCreatorEmail={expense.paidBy.email}
+                      />
+                    </li>
+                  );
+                })
+              ) : (
+                <div> no data</div>
+              )}
+            </ul>
+          )}
+        </div>
+
+        {/* body end */}
       </div>
       <RightSideBar />
       <AddFriendExpensePopUp

@@ -29,6 +29,7 @@ function AddFriendExpensePopUp({
   ]);
 
   useEffect(() => {
+    setPaidBy({ name: "you", email: USER.email });
     setMambers([
       {
         name: USER.firstName + " " + USER.lastName,
@@ -45,6 +46,7 @@ function AddFriendExpensePopUp({
     const splitWithArr = members.map((e) => {
       return {
         email: e.email,
+        name: e.name,
         amountLeft: Number(amount / 2),
         isSettled: e.email == paidBy.email ? true : false,
       };

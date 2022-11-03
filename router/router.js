@@ -12,6 +12,8 @@ router.get("/get_group_member_detail", controller.get_group_member_detail);
 
 router.get("/get_expenceData", controller.get_expenceData);
 
+router.get("/get_private_expenseData", controller.get_private_expenseData);
+
 // POST
 
 router.post("/new_expense", controller.new_expense);

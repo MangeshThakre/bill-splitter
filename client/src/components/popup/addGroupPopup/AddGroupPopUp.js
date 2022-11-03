@@ -592,13 +592,13 @@ function AddGroupPopUp({
                         onClick={() => handleAddGroupMember()}
                         disabled={
                           isEdit && USER.email === currentGroup.creator.email
-                            ? false
-                            : true
+                            ? true
+                            : false
                         }
                         className={
                           isEdit && USER.email === currentGroup.creator.email
-                            ? "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
-                            : "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                            ? "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                            : "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                         }
                       >
                         + Add a persion
@@ -663,8 +663,8 @@ function AddGroupPopUp({
                         type="submit"
                         disabled={
                           isEdit && USER.email === currentGroup.creator.email
-                            ? false
-                            : true
+                            ? true
+                            : false
                         }
                         className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
                       >
