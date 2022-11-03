@@ -354,15 +354,15 @@ class controller {
   //  new expance
   static async new_expense(req, res) {
     const groupId = req.body.groupId;
-    const expanseType = req.body.expanseType;
+    const expenseType = req.body.expenseType;
     const expanseDescription = req.body.expanseDescription;
     const amount = req.body.amount;
     const paidBy = req.body.paidBy;
     const splitWith = req.body.splitWith;
-    // console.log(paidBy);
+    console.log(paidBy);
     const expenseInfo = new expenseModel({
       groupId,
-      expanseType,
+      expenseType,
       expanseDescription,
       amount,
       paidBy,

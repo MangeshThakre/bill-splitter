@@ -59,7 +59,7 @@ function ChoosePayer({ setSecondaryPopUp, members, setPaidBy }) {
                   onClick={() => handleSelectMember(e)}
                   className="p-3 hover:bg-gray-100 cursor-pointer rounded-lg m-1 flex items-center gap-5"
                 >
-                  <img src={persion} className="w-8 h-8" alt={e.name} />{" "}
+                  <img src={persion} className="w-8 h-8" alt={e.name} />
                   {e.name}
                 </li>
               );

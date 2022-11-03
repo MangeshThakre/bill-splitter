@@ -14,7 +14,7 @@ import Couple from "../../../asset/couple.jpg";
 import Trip from "../../../asset/trip.jpg";
 import axios from "axios";
 
-function AddExpencePopUp({
+function AddGroupExpencePopUp({
   showAddExpencePopUp,
   setShowAddExpencePopUp,
   currentGroup,
@@ -49,8 +49,7 @@ function AddExpencePopUp({
     if (group.groupType == "Other") return Other;
   }
 
-  // console.log(isSaveLoading);
-
+  // handle add expanse
   async function handleAddExpanse(e) {
     e.preventDefault();
     const expanseDescription = e.target[0].value;
@@ -68,7 +67,7 @@ function AddExpencePopUp({
         url: URL + "/api/new_expense",
         data: {
           groupId: group._id,
-          expanseType: "GROUP",
+          expenseType: "GROUP",
           expanseDescription,
           amount,
           paidBy: paidBy.email,
@@ -170,7 +169,7 @@ function AddExpencePopUp({
                         }
                         className="py-2 px-3 mx-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                       >
-                        {USER._id == paidBy.id ? "You" : paidBy.name}
+                        {USER.email == paidBy.email ? "You" : paidBy.name}
                       </button>
                       and split
                       <button
@@ -212,6 +211,7 @@ function AddExpencePopUp({
                   </div>
                   {/* button */}
                   <div className="flex gap-8 mt-8 justify-end pt-3 border-t-2 border-gray-300">
+                    {/* cancle button  */}
                     <button
                       type="button"
                       onClick={() => {
@@ -222,7 +222,7 @@ function AddExpencePopUp({
                     >
                       Cancle
                     </button>
-
+                    {/* submit button */}
                     <button
                       type="submit"
                       className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
@@ -283,4 +283,4 @@ function AddExpencePopUp({
   );
 }
 
-export default AddExpencePopUp;
+export default AddGroupExpencePopUp;

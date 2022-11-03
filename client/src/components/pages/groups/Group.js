@@ -15,7 +15,7 @@ import loading from "../../../asset/loading.svg";
 import RightSideBar from "./RightSideBar";
 import GroupExpenceListItem from "./GroupExpenceListItem.js";
 // popup
-import AddExpencePopUp from "../../popup/addExpencePopUp/AddExpencePopUp";
+import AddGroupExpencePopUp from "../../popup/addExpencePopUp/AddGroupExpencePopUp";
 
 function Group() {
   const { id } = useParams();
@@ -110,7 +110,7 @@ function Group() {
         {/* body end */}
       </div>
       <RightSideBar currentGroup={currentGroup} />
-      <AddExpencePopUp
+      <AddGroupExpencePopUp
         showAddExpencePopUp={showAddExpencePopUp}
         setShowAddExpencePopUp={setShowAddExpencePopUp}
         currentGroup={currentGroup}

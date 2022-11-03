@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const expenseSchema = new Schema(
   {
     groupId: { type: String },
-    expanseTyp: { type: String },
+    expenseType: { type: String, required: true },
     expanseDescription: { type: String, required: true },
     paidBy: { type: String, required: true },
     amount: { type: Number, required: true },
