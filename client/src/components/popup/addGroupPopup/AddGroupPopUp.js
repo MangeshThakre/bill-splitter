@@ -32,6 +32,7 @@ function AddGroupPopUp({
   const [groupMember, setGroupMamber] = useState([]);
   const [groupType, setGroupType] = useState("Home");
   const [groupName, setGroupName] = useState("");
+  const [groupCreastor, setGroupCreator] = useState({});
   // loading
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
@@ -43,6 +44,7 @@ function AddGroupPopUp({
 
   useEffect(() => {
     if (isEdit) {
+      setGroupCreator(currentGroup.creator);
       setGroupType(currentGroup.groupType);
       setGroupMamber(currentGroup.membersArr);
       setGroupName(currentGroup.groupName);
@@ -231,9 +233,12 @@ function AddGroupPopUp({
     return `<p class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">${name}</p>`;
   }
 
-  function handleAlert(display, alertMessage) {
-    setAlertPopUp({ display, alertMessage });
-    setTimeout(() => setAlertPopUp({ display: false, alertMessage: "" }), 5000);
+  function handleAlert(display, alertMessage, type) {
+    setAlertPopUp({ display, alertMessage, type });
+    setTimeout(
+      () => setAlertPopUp({ display: false, alertMessage: "", type: "" }),
+      5000
+    );
   }
 
   function handleRemoveMEmber(e) {}
@@ -252,7 +257,8 @@ function AddGroupPopUp({
     if (isGroupExist) {
       return handleAlert(
         true,
-        "you already created the gruop with  similar name, please use different name for this group"
+        "you already created the gruop with  similar name, please use different name for this group",
+        "warning"
       );
     }
 
@@ -267,7 +273,8 @@ function AddGroupPopUp({
       );
       if (!isUnique) break;
     }
-    if (!isUnique) return handleAlert(true, "please dont repeat same member");
+    if (!isUnique)
+      return handleAlert(true, "please dont repeat same member", "warning");
     ////
 
     const creator = {
@@ -289,9 +296,11 @@ function AddGroupPopUp({
       setIsSaveLoading(false);
       setShowGroupPopUp(false);
       navigate(`/group/${groupResult._id}`);
+      return handleAlert(true, "successfully created new group", "success");
     } catch (error) {
       setIsSaveLoading(false);
       console.log(error);
+      return handleAlert(true, error.message, "error");
     }
   }
 
@@ -300,8 +309,6 @@ function AddGroupPopUp({
     event.preventDefault();
     const groupName = event.target[0].value;
     const membersArr = forminputMember();
-    // console.log(groupName);
-    console.log(membersArr);
 
     let isGroupExist = false;
     GROUPS.forEach((e) => {
@@ -315,14 +322,13 @@ function AddGroupPopUp({
     if (isGroupExist) {
       return handleAlert(
         true,
-        "you already created the gruop with  similar name, please use different name for this group"
+        "you already created the gruop with  similar name, please use different name for this group",
+        "warning"
       );
     }
-
     // check all group members are unique
     let isUnique = false;
     for (let i = 0; i < membersArr.length; i++) {
-      console.log(i);
       isUnique = !membersArr.some(
         (e, index) =>
           e.email.toLowerCase() === membersArr[i].email.toLowerCase() &&
@@ -331,9 +337,43 @@ function AddGroupPopUp({
       );
       if (!isUnique) break;
     }
-    console.log(isUnique);
-    if (!isUnique) return handleAlert(true, "please dont repeat same member");
+    if (!isUnique)
+      return handleAlert(
+        true,
+        "please dont repeat same group member",
+        "warning"
+      );
     ////
+
+    setIsSaveLoading(true);
+    try {
+      const response = await axios({
+        method: "put",
+        url: URL + "/api/update_group",
+        data: {
+          groupName,
+          membersArr,
+          groupType,
+          groupId: currentGroup._id,
+        },
+      });
+      const groupResult = await response.data;
+      // add group and update griends in readux
+      const updatedGroupArr = GROUPS.map((e) => {
+        if (e._id === currentGroup._id) {
+          return groupResult;
+        } else return e;
+      });
+      dispatch(groups(updatedGroupArr));
+
+      setIsSaveLoading(false);
+      setShowGroupPopUp(false);
+      return handleAlert(true, "successfully created new group", "success");
+    } catch (error) {
+      setIsSaveLoading(false);
+      console.log(error);
+      return handleAlert(true, error.message, "error");
+    }
   }
 
   // delete group
@@ -361,8 +401,6 @@ function AddGroupPopUp({
       setIsDeleteLoading(false);
     }
   }
-
-  // console.log(USER.email === currentGroup.creator.email ? false : true);
 
   return (
     <>
@@ -400,13 +438,8 @@ function AddGroupPopUp({
               {/* close button end */}
               <div className="p-6 flex gap-20">
                 {/* left */}
-                <div className=" ml-10  mt-20">
-                  {/* <img
-                    src={groupImg}
-                    className="roundeds-lg h-36 w-36 "
-                    alt="group"
-                  /> */}
-                  <div className="flex justify-center items-center w-full ">
+                <div className=" mt-20 flex-1 w-full">
+                  <div className="flex ml-10 justify-center items-center w-full ">
                     {groupType == "Home" ? (
                       <img className=" rounded-lg  h-48 w-48" src={Home} />
                     ) : null}
@@ -420,6 +453,25 @@ function AddGroupPopUp({
                       <img className=" rounded-lg  h-48 w-48" src={Other} />
                     ) : null}
                   </div>
+
+                  {isEdit ? (
+                    <div className=" mt-10 ml-5 flex flex-col gap-12">
+                      <p className="font-bold text-lg text-gray-600">
+                        Creator
+                        <span className=" font-bold text-lg text-blue-500">
+                          {" "}
+                          {groupCreastor.name}{" "}
+                        </span>{" "}
+                      </p>
+                      <p className="font-light text-sm text-gray-600">
+                        Only group creator <br />
+                        can add new new member,
+                        <br /> remove group members
+                        <br /> delete the group expenses. <br />
+                        or even delete the group
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
                 {/* left end */}
                 {/* right */}
@@ -456,10 +508,11 @@ function AddGroupPopUp({
                       <h1 className="text-gray-500   text-2xl font-bold">
                         Group Members
                       </h1>
-                      <ul ref={groupListEle}>
-                        {/*   firsts*/}
 
+                      {/* group members */}
+                      <ul ref={groupListEle}>
                         {!isEdit ? (
+                          //firsts
                           <>
                             <li className="flex gap-3 items-center mt-4">
                               <img
@@ -587,23 +640,28 @@ function AddGroupPopUp({
 
                         {/*  remaining dynamic */}
                       </ul>
+                      {/* group members end */}
+
+                      {/* add Persion button */}
                       <button
                         id="addPersion"
                         onClick={() => handleAddGroupMember()}
                         disabled={
-                          isEdit && USER.email === currentGroup.creator.email
-                            ? true
-                            : false
+                          isEdit && USER.email === groupCreastor.email
+                            ? false
+                            : true
                         }
                         className={
-                          isEdit && USER.email === currentGroup.creator.email
-                            ? "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
-                            : "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                          isEdit && USER.email === groupCreastor.email
+                            ? "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
+                            : "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                         }
                       >
                         + Add a persion
                       </button>
+                      {/* add Persion button end */}
                     </div>
+
                     {/* group type */}
                     <div>
                       <h1 className=" font-bold   text-xl text-gray-500">
@@ -656,6 +714,8 @@ function AddGroupPopUp({
                         </button>
                       </div>
                     </div>
+                    {/* group type end */}
+
                     {/*  submit form button */}
                     <div className="flex gap-6">
                       {/*   update / save button   */}
@@ -663,10 +723,15 @@ function AddGroupPopUp({
                         type="submit"
                         disabled={
                           isEdit && USER.email === currentGroup.creator.email
-                            ? true
-                            : false
+                            ? false
+                            : true
                         }
                         className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
+                        style={
+                          isEdit && USER.email === groupCreastor.email
+                            ? { cursor: "pointer" }
+                            : { cursor: "not-allowed" }
+                        }
                       >
                         {isEdit ? "Update" : "Save"}
                         {isSaveLoading ? (
@@ -689,18 +754,25 @@ function AddGroupPopUp({
                           </svg>
                         ) : null}
                       </button>
+                      {/*   update / save button   end */}
 
                       {/* delete button */}
                       {isEdit ? (
                         <button
                           type="button"
                           disabled={
-                            USER.email === currentGroup.creator.email
+                            isEdit && USER.email === groupCreastor.email
                               ? false
                               : true
                           }
                           onClick={() => handleDelete()}
-                          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                          cursor-not-allowed
+                          className="focus:outline-none text-white bg-red-700 cursor-not-allowed hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                          style={
+                            isEdit && USER.email === groupCreastor.email
+                              ? { cursor: "pointer" }
+                              : { cursor: "not-allowed" }
+                          }
                         >
                           Delete Group
                           {isDeleteLoading ? (
@@ -724,7 +796,9 @@ function AddGroupPopUp({
                           ) : null}
                         </button>
                       ) : null}
+                      {/* delete button end */}
                     </div>
+                    {/*  submit form button end */}
                   </form>
                 </div>
                 {/* right end */}
@@ -732,17 +806,26 @@ function AddGroupPopUp({
             </div>
           </div>
 
+          {/* alert pop up */}
           {alertPopUp.display ? (
             <dir className="Alert absolute bottom-0 ">
               <div
-                className="p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800"
+                className={
+                  (alertPopUp.type == "warning" &&
+                    "p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800") ||
+                  (alertPopUp.type == "error" &&
+                    "p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800") ||
+                  (alertPopUp.type == "success" &&
+                    "p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800")
+                }
                 role="alert"
               >
-                <span className="font-medium">Warning alert!</span>{" "}
+                <span className="font-medium">{alertPopUp.type} alert!</span>{" "}
                 {alertPopUp.alertMessage}
               </div>
             </dir>
           ) : null}
+          {/* alert pop up  end*/}
         </div>
       ) : null}
     </>

@@ -37,6 +37,31 @@ class controller {
     }
   }
 
+  // update group
+  static async update_group(req, res) {
+    const groupId = req.body.groupId;
+    const membersArr = req.body.membersArr;
+    const groupType = req.body.groupType;
+    const groupName = req.body.groupName;
+    try {
+      const result = await groupModel.findOneAndUpdate(
+        { _id: groupId },
+        {
+          $set: {
+            membersArr,
+            groupType,
+            groupName,
+          },
+        },
+        { returnOriginal: false }
+      );
+      console.log(result);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   // add friend
   static async add_friend(req, res) {
     const isNewcollection = req.body.isNewcollection;
