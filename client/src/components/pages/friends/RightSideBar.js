@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-// image
+
+// component
+import AddFriendPopUp from "../../popup/AddFriendPopUp";
+import { useSelector } from "react-redux";
 
 import edit from "../../../asset/edit.svg";
 function RightSideBar() {
@@ -21,6 +24,11 @@ function RightSideBar() {
           {/* edit group button  exit*/}
         </div>
       </div>
+      <AddFriendPopUp
+        showAddFreindpopUp={showFriendPopUp}
+        setShowAddFreindpopUp={setShowFriendPopUp}
+        isEdit={true}
+      />
     </>
   );
 }

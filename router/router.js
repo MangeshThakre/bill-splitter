@@ -26,7 +26,11 @@ router.post("/add_friend", controller.add_friend);
 
 router.put("/settle_expense", controller.settle_expense);
 
+router.put("/update_friend", controller.update_friend);
+
 // DELETE
+
+router.delete("/delete_friend", controller.delete_friend);
 
 router.delete("/delete_group", controller.delete_group);
 

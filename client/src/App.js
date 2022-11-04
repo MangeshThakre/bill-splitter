@@ -77,9 +77,8 @@ function App() {
                 <Routes>
                   <Route path="/dashbord" element={<Dashbord />} />
                   <Route path="/recent-acitvity" element={<RecentAcitvity />} />
-                  <Route path="/all-expenses" element={<AllExpense />} />
+                  <Route path="/all_expenses" element={<AllExpense />} />
                   <Route path="/users" element={<UserPage />} />
-                  <Route path="/all-expenses" element={<UserPage />} />
                   <Route path="/group/:id" element={<Group />} />
                   <Route path="/friend/:email" element={<Friend />} />
 

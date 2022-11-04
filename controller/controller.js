@@ -66,6 +66,46 @@ class controller {
     }
   }
 
+  // update friend
+  static async update_friend(req, res) {
+    const friend = req.body.friend;
+    const userId = req.body.userId;
+    try {
+      const result = await firendsModel.findOneAndUpdate(
+        { userId, "friendsArr.email": friend.email },
+        {
+          $set: { "friendsArr.$.name": friend.name },
+        },
+        { returnOriginal: false }
+      );
+      res.status(200).json({ friendsArr: result.friendsArr });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // delete friend
+  static async delete_friend(req, res) {
+    const userId = req.query.userId;
+    const friendEmail = req.query.friendEmail;
+    try {
+      const result = await firendsModel.findOneAndUpdate(
+        { userId },
+        {
+          $pull: {
+            friendsArr: {
+              email: friendEmail,
+            },
+          },
+        },
+        { returnOriginal: false }
+      );
+      res.status(200).json({ friendsArr: result.friendsArr });
+    } catch (error) {
+      res.status(500).json(error.message);
+    }
+  }
+
   // static async create_group(req, res) {
   //   const userId = req.body.creator.id;
   //   const name = req.body.creator.name;
