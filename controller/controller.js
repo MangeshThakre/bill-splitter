@@ -9,7 +9,6 @@ const { v4: uuidv4 } = require("uuid");
 
 class controller {
   //  create group
-
   static async create_group(req, res) {
     const groupType = req.body.groupType;
     const groupName = req.body.groupName;
@@ -55,7 +54,28 @@ class controller {
         },
         { returnOriginal: false }
       );
-      console.log(result);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // remove group member
+  static async remove_group_member(req, res) {
+    const groupId = req.query.groupId;
+    const memberEmail = req.query.memberEmail;
+    try {
+      const result = await groupModel.findOneAndUpdate(
+        { _id: groupId },
+        {
+          $pull: {
+            membersArr: {
+              email: memberEmail,
+            },
+          },
+        },
+        { returnOriginal: false }
+      );
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -246,7 +266,6 @@ class controller {
 
   //       const { newFriendsArr, newGroupMembersArr } =
   //         await handleGroupAndFriendArr(newMemberArr);
-
   //       const groupMembersArr = [...newGroupMembersArr, ...existingMembersArr];
 
   //       await firendsModel.updateOne(
@@ -266,6 +285,8 @@ class controller {
   //     console.log(error);
   //   }
   // }
+
+  // delete group
 
   // delete group
   static async delete_group(req, res) {
@@ -504,7 +525,7 @@ class controller {
       res.status(200).json(groupExpenseData);
     } catch (error) {
       res.status(500).json({ error: error.message });
-      console.log(error.message);
+      console.log(error);
     }
   }
 
@@ -512,20 +533,6 @@ class controller {
     const userEmail = req.query.user;
     const friendEmail = req.query.friend;
     const userId = req.query.userId;
-
-    console.log(userEmail, friendEmail);
-
-    // const friendDetaie = await expenseModel.aggregate([
-    //   {
-    //     $match: {
-    //       expenseType: "PRIVATE",
-    //       "splitWith.email": friendEmail,
-    //       "splitWith.email": userEmail,
-    //     },
-    //   },
-    // ]);
-    // console.log(friendDetaie);
-
     try {
       const friendDetail = await expenseModel.aggregate([
         { $match: { expenseType: "PRIVATE" } },
@@ -612,6 +619,15 @@ class controller {
       console.log(result);
     } catch (error) {
       console.log(error.message);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  //get_all_expenses
+  static async get_all_expenses(req, res) {
+    const userId = req.body.userId;
+    try {
+    } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }

@@ -1,33 +1,110 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
+// img
+import loading from "../../../asset/loading.svg";
+
+// component
+import GroupExpenceListItem from "../groups/GroupExpenceListItem";
+import { Form } from "react-router-dom";
 function AllExpense() {
+  const URL = process.env.REACT_APP_URL;
+  const USER = useSelector((state) => state.global.user);
+  const [allExpense, setAllExpense] = useState([]);
+  const [isAllExpensesLoaidng, setIsAllExpensesLoading] = useState(true);
+  const [alertPopUp, setAlertPopUp] = useState({
+    display: false,
+    alertMessage: "",
+    type: "",
+  });
+  function handleAlert(display, alertMessage, type) {
+    setAlertPopUp({ display, alertMessage, type });
+    setTimeout(
+      () => setAlertPopUp({ display: false, alertMessage: "", type: "" }),
+      5000
+    );
+  }
+
+  // useEffect(() => getAllExpenses(), []);
+
+  async function getAllExpenses() {
+    setIsAllExpensesLoading(true);
+    try {
+      const response = await axios({
+        method: "get",
+        url: URL + "/api/get_all_expenses?userEmail=" + USER.email,
+      });
+      const data = await response.data;
+      console.log(data);
+
+      setIsAllExpensesLoading(false);
+    } catch (error) {
+      setIsAllExpensesLoading(false);
+      handleAlert(true, error.message, "error");
+    }
+  }
+
   return (
     <>
-      <div id="allExpense" className="flex-1  mx-2 shadow-xl">
+      <div id="allExpense" className="flex-1   mx-2 shadow-xl">
         <div id="dashbordHeader" className="w-full   bg-gray-200">
           {/* dashbord   heading 01*/}
           <div className="  flex justify-end h-14 items-center gap-3 px-4">
             <h1 className="flex-1 ml-auto    text-lg font-semibold ">
               All expenses
             </h1>
-            {/* add expance bitton */}
-            <button
-              type="button"
-              className="text-white bg-[#F7BE38] hover:bg-[#F7BE38]/90 focus:ring-4 focus:outline-none focus:ring-[#F7BE38]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#F7BE38]/50 "
-            >
-              Add expanse
-            </button>
-            {/* settle up button */}
-            <button
-              type="button"
-              className="text-white bg-[#2557D6] hover:bg-[#2557D6]/90 focus:ring-4 focus:ring-[#2557D6]/50 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#2557D6]/50 "
-            >
-              settle up
-            </button>
           </div>
         </div>
+
+        {/* body */}
+        <div className="basis-full overflow-y-auto h-full">
+          {isAllExpensesLoaidng ? (
+            <div className="h-full flex justify-center items-center">
+              <img src={loading} alt="loading" />
+            </div>
+          ) : (
+            <ul className="mt-2">
+              {allExpense ? (
+                allExpense.map((expense, i) => {
+                  return (
+                    <li key={i}>
+                      <GroupExpenceListItem expenseDetail={expense} />
+                    </li>
+                  );
+                })
+              ) : (
+                <div> no data</div>
+              )}
+            </ul>
+          )}
+        </div>
+
+        {/* body end */}
       </div>
-      {/* sidebar */}
+
+      {/* alert pop up */}
+      {alertPopUp.display ? (
+        <dir className="Alert absolute bottom-0  left-0 z-40">
+          <div
+            className={
+              (alertPopUp.type == "warning" &&
+                "p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800") ||
+              (alertPopUp.type == "error" &&
+                "p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800") ||
+              (alertPopUp.type == "success" &&
+                "p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800")
+            }
+            // className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800"
+            role="alert"
+          >
+            <span className="font-medium">{alertPopUp.type} alert!</span>{" "}
+            {alertPopUp.alertMessage}
+          </div>
+        </dir>
+      ) : null}
+      {/* alert pop up  end*/}
     </>
   );
 }

@@ -23,10 +23,11 @@ function AddGroupPopUp({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const groupListEle = useRef("");
+  const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
   const GROUPS = useSelector((state) => state.global.groups);
   const FRIENDS = useSelector((state) => state.global.friends);
-  const URL = process.env.REACT_APP_URL;
+  const EXPENSES = useSelector((state) => state.global.expenses);
   const allFriends = FRIENDS.length > 0 ? FRIENDS : [];
 
   const [groupMember, setGroupMamber] = useState([]);
@@ -40,6 +41,7 @@ function AddGroupPopUp({
   const [alertPopUp, setAlertPopUp] = useState({
     display: false,
     alertMessage: "",
+    type: "",
   });
 
   useEffect(() => {
@@ -241,7 +243,61 @@ function AddGroupPopUp({
     );
   }
 
-  function handleRemoveMEmber(e) {}
+  // handle is edit : returns boolean value
+  function handleIsEdit() {
+    if (isEdit) {
+      if (USER.email === groupCreastor.email) return true;
+      else return false;
+    } else return true;
+  }
+
+  // handle remove group - Member button
+  async function handleRemoveMEmber(e) {
+    const memberEmail = e.target.parentElement.children[2].value;
+    const memberName =
+      e.target.parentElement.children[1].firstElementChild.value;
+    if (memberEmail == groupCreastor.email) return;
+    const currentMemberAllExpence = [];
+    EXPENSES.forEach((expense) => {
+      const currentMember = expense.memberArr.find(
+        ({ email }) => email == memberEmail
+      );
+      if (currentMember) currentMemberAllExpence.push(currentMember);
+    });
+    const isSettled = currentMemberAllExpence.every(
+      (e) => e.isSettled === true
+    );
+
+    if (isSettled) {
+      const response = await axios({
+        method: "delete",
+        url:
+          URL +
+          "/api/remove_group_member?groupId=" +
+          currentGroup._id +
+          "&memberEmail=" +
+          memberEmail,
+      });
+      const updatedGroup = await response.data;
+      const newGroupArr = GROUPS.map((e) => {
+        if (e.id === currentGroup.id) return updatedGroup;
+        else return e;
+      });
+      dispatch(groups(newGroupArr));
+      e.target.parentElement.remove();
+      return handleAlert(
+        true,
+        `success fully removed ${memberName} from the grouo`,
+        "success"
+      );
+    } else {
+      return handleAlert(
+        true,
+        "You can not remove this member because he have not setteled his payment yet in this group",
+        "warning"
+      );
+    }
+  }
 
   //  submit  from
   async function handleAddGroup(event) {
@@ -365,10 +421,13 @@ function AddGroupPopUp({
         } else return e;
       });
       dispatch(groups(updatedGroupArr));
-
       setIsSaveLoading(false);
       setShowGroupPopUp(false);
-      return handleAlert(true, "successfully created new group", "success");
+      return handleAlert(
+        true,
+        "successfully Updated group " + groupName,
+        "success"
+      );
     } catch (error) {
       setIsSaveLoading(false);
       console.log(error);
@@ -389,16 +448,20 @@ function AddGroupPopUp({
         const updatedGroup = GROUPS.filter(
           ({ _id }) => _id !== currentGroup._id
         );
-
         setShowGroupPopUp(false);
-        navigate("/dashbord");
+        navigate("/all_expenses");
+        setIsDeleteLoading(false);
+        return handleAlert(
+          true,
+          `successfully deleted  ${currentGroup.groupName} group`,
+          "success"
+        );
         dispatch(groups(updatedGroup));
       }
-
-      setIsDeleteLoading(false);
     } catch (error) {
       console.log(error);
       setIsDeleteLoading(false);
+      return handleAlert(true, "successfully created new group", "success");
     }
   }
 
@@ -625,13 +688,17 @@ function AddGroupPopUp({
                                     defaultValue={member.email}
                                     disabled={member.name && member.email}
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={(e) => handleRemoveMEmber(e)}
-                                    className="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
-                                  >
-                                    x
-                                  </button>
+                                  {groupCreastor.email == member.email ? (
+                                    <div className="w-[5rem] text-xl">🅰️</div>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handleRemoveMEmber(e)}
+                                      className="text-red-700 border justify-center h-8  w-8 p-3 rounded-full font-bold border-red-700 hover:bg-red-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300   text-sm  text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800"
+                                    >
+                                      x
+                                    </button>
+                                  )}
                                 </li>
                               );
                             })}
@@ -646,13 +713,9 @@ function AddGroupPopUp({
                       <button
                         id="addPersion"
                         onClick={() => handleAddGroupMember()}
-                        disabled={
-                          isEdit && USER.email === groupCreastor.email
-                            ? false
-                            : true
-                        }
+                        disabled={handleIsEdit() ? false : true}
                         className={
-                          isEdit && USER.email === groupCreastor.email
+                          handleIsEdit()
                             ? "my-5 text-blue-500 text-md font-semibold cursor-pointer h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                             : "my-5 text-blue-500 text-md font-semibold cursor-not-allowed h-8 flex items-center justify-center  w-32 rounded-lg  hover:bg-[#c9cdd3]"
                         }
@@ -721,14 +784,10 @@ function AddGroupPopUp({
                       {/*   update / save button   */}
                       <button
                         type="submit"
-                        disabled={
-                          isEdit && USER.email === currentGroup.creator.email
-                            ? false
-                            : true
-                        }
+                        disabled={handleIsEdit() ? false : true}
                         className="text-white font-bold   text-center    bg-[#FF9119] hover:bg-[#FF9119]/80 focus:ring-4 focus:outline-none focus:ring-[#FF9119]/50  rounded-lg text-sm px-5 py-2.5  inline-flex items-center dark:hover:bg-[#FF9119]/80 dark:focus:ring-[#FF9119]/40 mr-2 mb-2"
                         style={
-                          isEdit && USER.email === groupCreastor.email
+                          handleIsEdit()
                             ? { cursor: "pointer" }
                             : { cursor: "not-allowed" }
                         }
@@ -766,7 +825,6 @@ function AddGroupPopUp({
                               : true
                           }
                           onClick={() => handleDelete()}
-                          cursor-not-allowed
                           className="focus:outline-none text-white bg-red-700 cursor-not-allowed hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                           style={
                             isEdit && USER.email === groupCreastor.email
@@ -805,10 +863,9 @@ function AddGroupPopUp({
               </div>
             </div>
           </div>
-
           {/* alert pop up */}
           {alertPopUp.display ? (
-            <dir className="Alert absolute bottom-0 ">
+            <dir className="Alert absolute bottom-0  left-0 z-40">
               <div
                 className={
                   (alertPopUp.type == "warning" &&
@@ -818,6 +875,7 @@ function AddGroupPopUp({
                   (alertPopUp.type == "success" &&
                     "p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800")
                 }
+                // className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800"
                 role="alert"
               >
                 <span className="font-medium">{alertPopUp.type} alert!</span>{" "}

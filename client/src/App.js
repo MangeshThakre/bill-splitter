@@ -36,7 +36,7 @@ function App() {
       const data = await response.data.user;
       dispatch(user(data));
       setIsFetchUserIsLoading(false);
-      navigate("/dashbord");
+      navigate("/all_expenses");
     } catch (error) {
       setIsFetchUserIsLoading(false);
       // console.log(error);
@@ -75,8 +75,6 @@ function App() {
               <Sidebar />
               <div className="w-full  flex">
                 <Routes>
-                  <Route path="/dashbord" element={<Dashbord />} />
-                  <Route path="/recent-acitvity" element={<RecentAcitvity />} />
                   <Route path="/all_expenses" element={<AllExpense />} />
                   <Route path="/users" element={<UserPage />} />
                   <Route path="/group/:id" element={<Group />} />

@@ -1,16 +1,19 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import axios from "axios";
 import { user } from "../../../redux/globalSplice";
 import Group from "./Group";
+import { expenses } from "../../../redux/globalSplice";
 // image
 import loading from "../../../asset/loading.svg";
 
 function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
+  const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
+  const EXPENSES = useSelector((state) => state.global.expenses);
   const [showBody, setShowBody] = useState(false);
 
   const [currentExpenceMemberArr, setCurrentExpenceMemberArr] = useState(
@@ -82,10 +85,21 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
           name: e.name,
         };
       });
-      // console.log(newCurrentExpenceMemberArr);
-
+      const currentExpense = EXPENSES.find((e) => e.id === expenseId);
+      const newCurrentExpense = {
+        amount: currentExpense.amount,
+        createdAt: currentExpense.createdAt,
+        expanseDescription: currentExpense.expanseDescription,
+        id: currentExpense.id,
+        memberArr: newCurrentExpenceMemberArr,
+        paidBy: currentExpense.paidBy,
+      };
+      const newExpence = EXPENSES.map((e) => {
+        if (e.id === expenseId) return newCurrentExpense;
+        else return e;
+      });
       setCurrentExpenceMemberArr(newCurrentExpenceMemberArr);
-
+      dispatch(expenses(newExpence));
       setSettleExpenseLoading(false);
     } catch (error) {
       setSettleExpenseLoading(false);

@@ -39,6 +39,8 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
     }, time);
   }
 
+  /// update friend
+
   async function handleUpdateFriend(e) {
     e.preventDefault();
     const name = e.target[0].value;
@@ -64,6 +66,8 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
       return handleAlert(error.message, 5000, "error");
     }
   }
+
+  // Add friend
 
   async function handleAddFriend(e) {
     e.preventDefault();
@@ -91,6 +95,7 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
       dispatch(friends(friendsArr));
       setIsAddFriendLoading(false);
       setShowAddFreindpopUp(false);
+      navigate("/friend/" + email);
       return handleAlert(
         `successfuly added ${name} as a friend`,
         5000,
@@ -101,6 +106,8 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
       return handleAlert(error.message, 5000, "error");
     }
   }
+
+  // Delete friend
 
   async function handleDeleteFriend(e) {
     setIsAddFriendLoading(true);
@@ -258,13 +265,16 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
                       </svg>
                     ) : null}
                   </button>
-                  <button
-                    type="button"
-                    onClick={(e) => handleDeleteFriend(e)}
-                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                  >
-                    Delete friend
-                  </button>
+
+                  {isEdit ? (
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteFriend(e)}
+                      className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                    >
+                      Delete friend
+                    </button>
+                  ) : null}
                 </div>
               </form>
               {/*  */}

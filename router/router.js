@@ -14,6 +14,8 @@ router.get("/get_expenceData", controller.get_expenceData);
 
 router.get("/get_private_expenseData", controller.get_private_expenseData);
 
+router.get("/get_all_expenses", controller.get_all_expenses);
+
 // POST
 
 router.post("/new_expense", controller.new_expense);
@@ -31,6 +33,8 @@ router.put("/settle_expense", controller.settle_expense);
 router.put("/update_friend", controller.update_friend);
 
 // DELETE
+
+router.delete("/remove_group_member", controller.remove_group_member);
 
 router.delete("/delete_friend", controller.delete_friend);
 

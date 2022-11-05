@@ -84,7 +84,7 @@ function Sidebar() {
         <div className="overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800 h-full pt-10">
           <ul className="space-y-2  flex   flex-col   h-full">
             {/* dashbord */}
-            <li>
+            {/* <li>
               <Link
                 to="dashbord"
                 className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700"
@@ -101,9 +101,9 @@ function Sidebar() {
                 </svg>
                 <span className="ml-3">Dashboard</span>
               </Link>
-            </li>
+            </li> */}
             {/* Recent activity */}
-            <li>
+            {/* <li>
               <Link
                 to="recent-acitvity"
                 className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700"
@@ -121,7 +121,7 @@ function Sidebar() {
                   Redent acitvity
                 </span>
               </Link>
-            </li>
+            </li> */}
             {/* All expenses */}
             <li>
               <Link
@@ -143,28 +143,7 @@ function Sidebar() {
                 </span>
               </Link>
             </li>
-            {/* user */}
-            <li>
-              <Link
-                to="users"
-                className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="flex-1 ml-3 whitespace-nowrap">Users</span>
-              </Link>
-            </li>
+
             {/* group  list */}
             <li>
               <button
@@ -287,6 +266,28 @@ function Sidebar() {
                   <ListWithInfo listInfo={FRIENDS} type={"friend"} />
                 )}
               </ul>
+            </li>
+            {/* user */}
+            <li>
+              <Link
+                to="users"
+                className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                <span className="flex-1 ml-3 whitespace-nowrap">User</span>
+              </Link>
             </li>
             {/* log out */}
             <li className=" mt-auto flex-1 flex items-end">
