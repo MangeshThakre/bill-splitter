@@ -625,9 +625,65 @@ class controller {
 
   //get_all_expenses
   static async get_all_expenses(req, res) {
-    const userId = req.body.userId;
+    const { userEmail, userId } = req.query;
     try {
+      // group expenses
+      const groupExpeses = await groupModel.aggregate([
+        {
+          $match: {
+            membersArr: { $elemMatch: { email: userEmail } },
+          },
+        },
+        { $addFields: { _idStr: { $toString: "$_id" } } },
+        {
+          $lookup: {
+            from: "expenses",
+            localField: "_idStr",
+            foreignField: "groupId",
+            as: "expenses",
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            groupId: "$_id",
+            groupType: "$groupType",
+            expenseType: "GROUP",
+            expenses: "$expenses.expanseDescription",
+            amount: "$expenses.amount",
+          },
+        },
+      ]);
+      const { friendsArr } = await firendsModel.findOne({ userId });
+
+      const personalExpenses = await expenseModel.aggregate([
+        { $match: { expenseType: "PRIVATE" } },
+        { $match: { "splitWith.email": userEmail } },
+      ]);
+
+      // pprivete expense
+      const friendExpenseArr = [];
+      friendsArr.forEach((friend) => {
+        const obj = {};
+        const friendExpense = personalExpenses.filter((e) =>
+          e.splitWith.some((member) => member.email == friend.email)
+        );
+        if (friendExpense.length < 1) return;
+        obj["groupId"] = "";
+        obj["groupType"] = "";
+        obj["expenseType"] = "PRIVATE";
+        obj["friendName"] = friend.name;
+        obj["friendEmail"] = friend.email;
+        obj["expenses"] = friendExpense.map((ex) => ex.expanseDescription);
+        obj["amount"] = friendExpense.map((ex) => ex.amount);
+        friendExpenseArr.push(obj);
+      });
+
+      // all expenses arr
+      const allExpenses = [...groupExpeses, ...friendExpenseArr];
+      res.status(200).json(allExpenses);
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error: error.message });
     }
   }

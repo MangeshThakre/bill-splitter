@@ -89,7 +89,7 @@ function Group() {
             </div>
           ) : (
             <ul className="mt-2">
-              {EXPENSES ? (
+              {EXPENSES.length > 0 ? (
                 EXPENSES.map((expense, i) => {
                   return (
                     <li key={i}>
@@ -101,7 +101,9 @@ function Group() {
                   );
                 })
               ) : (
-                <div> no data</div>
+                <div className="h-full flex mt-10 justify-center items-center  font-bold text-4xl text-blue-300">
+                  Add Expense
+                </div>
               )}
             </ul>
           )}

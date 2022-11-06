@@ -9,7 +9,7 @@ const userSchema = new Schema({
   profilePhoto: { type: String },
   hash: { type: String },
   salt: { type: String },
-  source: { type: String },
+  source: { type: Array },
   created_at: { type: Date },
 });
 const userModel = mongoose.model("user", userSchema);

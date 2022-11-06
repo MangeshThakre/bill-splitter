@@ -93,7 +93,9 @@ function Friends() {
                   );
                 })
               ) : (
-                <div> no data</div>
+                <div className="h-full flex justify-center items-center  font-bold text-4xl text-blue-300">
+                  Add Expenses
+                </div>
               )}
             </ul>
           )}

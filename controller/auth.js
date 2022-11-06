@@ -38,7 +38,7 @@ class AuthController {
       email,
       hash,
       salt,
-      source: "local",
+      source: ["local"],
     });
     const result = await userInfo.save();
     res.status(200).json({ error: false, data: result });

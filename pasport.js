@@ -71,7 +71,8 @@ passport.use(
       const lastName = profile._json.family_name;
       const email = profile._json.email;
       const profilePhoto = profile._json.picture;
-      const source = "google";
+      const source = ["google"];
+
       try {
         const user = await userModel.findOne({ email });
         if (user) {
@@ -80,6 +81,15 @@ passport.use(
             const updatedUser = await userModel.findOneAndUpdate(
               { email },
               { profilePhoto },
+              { new: true }
+            );
+            return done(null, updatedUser);
+          }
+
+          if (!user.source.includes("google")) {
+            const updatedUser = await userModel.findOneAndUpdate(
+              { email },
+              { source: ["local ,google"] },
               { new: true }
             );
             return done(null, updatedUser);
