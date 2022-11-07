@@ -9,7 +9,7 @@ function UserPage() {
   const [alertPopUp, setAlertPopUp] = useState({
     diaplay: false,
     message: "",
-    time: 0,
+    type: "",
   });
 
   function handleAlert(display, alertMessage, type) {

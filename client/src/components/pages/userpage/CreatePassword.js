@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { user } from "../../../redux/globalSplice.js";
 
-function CreatePassword() {
+function CreatePassword({ handleAlert }) {
   const dispatch = useDispatch();
   const USER = useSelector((state) => state.global.user);
   const URL = process.env.REACT_APP_URL;
@@ -14,8 +14,8 @@ function CreatePassword() {
 
   async function handleAddPassword(e) {
     e.preventDefault();
-    const password = e.target[0].value;
-    const confirmPass = e.target[1].value;
+    let password = e.target[0].value;
+    let confirmPass = e.target[1].value;
     console.log(password, confirmPass);
     if (password !== confirmPass) {
       return alert("password nad con pass not match");
@@ -30,16 +30,27 @@ function CreatePassword() {
       const data = await response.data;
       dispatch(user(data));
       setIsSavePassLoading(false);
+      e.target[0].value = "";
+      e.target[1].value = "";
+      return handleAlert(true, "successfuly created the password", "success");
     } catch (error) {
       setIsSavePassLoading(false);
-      return alert(error);
+      return handleAlert(true, error.response.data.error, "error");
     }
   }
 
   return (
     <>
-      <div className="flex items-center mb-6 h-10 bg-gray-300 px-10">
+      <div className="flex items-center  justify-between mb-6 h-10 bg-gray-300 px-10">
         <p className="font-semibold text-gray-600">Create Password</p>
+        <p className="text-lg font-semibold text-gray-700">
+          login access :
+          {USER.source.map((e, i, arr) => (
+            <span className="font-semibold text-blue-500 ml-3" key={i}>
+              {e} {arr.length > 1 && i == 0 ? "," : null}
+            </span>
+          ))}
+        </p>
       </div>
       <form
         className="flex items-center px-10"

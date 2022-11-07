@@ -50,4 +50,6 @@ router.post("/create_password", authcontroller.create_password);
 // update password
 router.post("/update_password", authcontroller.update_password);
 
+router.get("/send_otp", authcontroller.send_otp);
+
 module.exports = router;
