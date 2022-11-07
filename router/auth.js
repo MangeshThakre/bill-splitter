@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { authenticate } = require("passport");
 const passport = require("passport");
 const authcontroller = require("../controller/auth.js");
 require("../pasport.js");
@@ -43,5 +44,10 @@ router.get(
 
 // SIGN-UP
 router.post("/singup", authcontroller.signUp);
+
+// createpass
+router.post("/create_password", authcontroller.create_password);
+// update password
+router.post("/update_password", authcontroller.update_password);
 
 module.exports = router;

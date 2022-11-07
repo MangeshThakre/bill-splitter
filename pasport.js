@@ -89,12 +89,12 @@ passport.use(
           if (!user.source.includes("google")) {
             const updatedUser = await userModel.findOneAndUpdate(
               { email },
+
               { source: ["local ,google"] },
               { new: true }
             );
             return done(null, updatedUser);
           }
-
           return done(null, user);
         } else if (!user) {
           const saveUserInfo = new userModel({
