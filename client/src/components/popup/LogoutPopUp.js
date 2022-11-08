@@ -1,9 +1,11 @@
 import { user } from "../../redux/globalSplice.js";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function LogoutPopUp({ setLoguotPopu, loguotPopUp }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const URL = process.env.REACT_APP_URL;
 
   async function handleLogout() {
@@ -15,6 +17,7 @@ function LogoutPopUp({ setLoguotPopu, loguotPopUp }) {
       });
       const data = await response.data;
       if (!data.error) dispatch(user({}));
+      navigate("/signin");
     } catch (error) {
       console.log(error);
     }

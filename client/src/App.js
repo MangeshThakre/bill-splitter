@@ -67,6 +67,11 @@ function App() {
                 path="/signup"
                 element={<SignIn_singUp page={"signup"} />}
               />
+              <Route
+                exect
+                path="/forget_password"
+                element={<SignIn_singUp page={"forget_password"} />}
+              />
             </Routes>
           ) : (
             <div className="pt-20 h-full flex">

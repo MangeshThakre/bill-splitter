@@ -2,9 +2,9 @@ import React from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { user } from "../../../redux/globalSplice.js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-function Signin({ setAlertPopUp }) {
+function Signin({ handleAlert }) {
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
@@ -29,8 +29,12 @@ function Signin({ setAlertPopUp }) {
     if (!data.error) {
       window.location.href = "http://localhost:3000";
     } else {
-      setAlertPopUp({ display: true, alertMessage: data.message });
+      handleAlert(true, data.message, "error");
     }
+  }
+
+  async function google() {
+    window.open(URL + "/auth/google/callback", "_self");
   }
 
   return (
@@ -73,12 +77,12 @@ function Signin({ setAlertPopUp }) {
           />
         </div>
         <div className="flex items-start">
-          <a
-            href="#"
+          <Link
+            to="/forget_password"
             className="ml-auto text-sm text-blue-700 hover:underline dark:text-blue-500"
           >
             Lost Password?
-          </a>
+          </Link>
         </div>
         <button
           type="submit"
@@ -91,6 +95,7 @@ function Signin({ setAlertPopUp }) {
 
         <button
           type="button"
+          onClick={() => google()}
           className="text-white   w-[100%] justify-center  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mr-2 mb-2"
         >
           <svg

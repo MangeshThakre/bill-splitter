@@ -1,9 +1,10 @@
 import React from "react";
 import "./Navbar.css";
+import { useState } from "react";
 import logo from "../../asset/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-
+import { useLocation } from "react-router-dom";
 function Navbar({ loading }) {
   let navigate = useNavigate();
   const USER = useSelector((state) => state.global.user);
@@ -37,15 +38,27 @@ function Navbar({ loading }) {
       <ul className="flex flex-col  justify-center  mt-4 bg-gray-50 rounded-lg border border-gray-100 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
         <button
           type="button"
-          className="text-white bg-blue-700   font-semibold hover:bg-blue-800 focus:ring-4 focus:ring-blue-300  rounded-lg text-sm px-5 py-2   dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          onClick={() => navigate("/signin")}
+          className={
+            useLocation().pathname == "/signin"
+              ? "text-white bg-blue-700   font-semibold hover:bg-blue-800 focus:ring-4 focus:ring-blue-300  rounded-lg text-sm px-5 py-2   dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              : "py-2 px-5   text-sm   font-semibold text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          }
+          onClick={() => {
+            navigate("/signin");
+          }}
         >
           Sign in
         </button>
         <button
           type="button"
-          className="py-2 px-5   text-sm   font-semibold text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          onClick={() => navigate("/signup")}
+          className={
+            useLocation().pathname == "/signup"
+              ? "text-white bg-blue-700   font-semibold hover:bg-blue-800 focus:ring-4 focus:ring-blue-300  rounded-lg text-sm px-5 py-2   dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              : "py-2 px-5   text-sm   font-semibold text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          }
+          onClick={() => {
+            navigate("/signup");
+          }}
         >
           sing up
         </button>

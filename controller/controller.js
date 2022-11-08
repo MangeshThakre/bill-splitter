@@ -5,9 +5,28 @@ const groupModel = require("../schema/groupSchema.js");
 const firendsModel = require("../schema/friendsSchema.js");
 const expenseModel = require("../schema/expenseSchema.js");
 
-const { v4: uuidv4 } = require("uuid");
-
 class controller {
+  // update user name
+  static async update_user_name(req, res) {
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const userId = req.body.userId;
+
+    try {
+      const result = await userModel.findByIdAndUpdate(
+        userId,
+        {
+          firstName,
+          lastName,
+        },
+        { new: true, select: { hash: 0, salt: 0 } }
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   //  create group
   static async create_group(req, res) {
     const groupType = req.body.groupType;

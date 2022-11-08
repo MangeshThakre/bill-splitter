@@ -4,7 +4,7 @@ import axios from "axios";
 import md5 from "md5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-function Signup() {
+function Signup({ handleAlert }) {
   const USER = useSelector((state) => state.global.user);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +22,7 @@ function Signup() {
     const phoneNo = Number(e.target[2].value);
     const email = e.target[3].value;
     const passWord = e.target[4].value;
+
     try {
       setIsLoading(true);
       const response = await axios({
@@ -37,7 +38,7 @@ function Signup() {
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
+      handleAlert(true, error.message, "error");
     }
   }
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { user } from "../../../redux/globalSplice.js";
 
-function CreatePassword({ handleAlert }) {
+function CreatePassword({ handleAlert, setIsForget = "" }) {
   const dispatch = useDispatch();
   const USER = useSelector((state) => state.global.user);
   const URL = process.env.REACT_APP_URL;
@@ -16,7 +16,6 @@ function CreatePassword({ handleAlert }) {
     e.preventDefault();
     let password = e.target[0].value;
     let confirmPass = e.target[1].value;
-    console.log(password, confirmPass);
     if (password !== confirmPass) {
       return alert("password nad con pass not match");
     }
@@ -94,7 +93,7 @@ function CreatePassword({ handleAlert }) {
         </div>
         <button
           type="submit"
-          className="flex-0 ml-auto focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          className="flex-0 ml-auto  py-2 px-3 text-xs font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Save
           {isSavePassLoading ? (

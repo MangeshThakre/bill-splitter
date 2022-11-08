@@ -26,6 +26,8 @@ router.post("/add_friend", controller.add_friend);
 
 // UPDATE
 
+router.put("/update_user_name", controller.update_user_name);
+
 router.put("/update_group", controller.update_group);
 
 router.put("/settle_expense", controller.settle_expense);
