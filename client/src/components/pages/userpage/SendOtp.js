@@ -38,7 +38,11 @@ function SendOtp({ handleAlert, setVerify, isForget, setIsForget }) {
       const data = await response.data;
       setSErverOTP(data.otp);
       setIsSetOtpLoading(false);
-      return handleAlert(true, `verify OTP sended on ${USER.email}`, "warning");
+      return handleAlert(
+        true,
+        `please verify OTP sent on ${USER.email}`,
+        "warning"
+      );
     } catch (error) {
       setIsSetOtpLoading(false);
       return handleAlert(true, error.response.data.error, "error");
@@ -120,7 +124,7 @@ function SendOtp({ handleAlert, setVerify, isForget, setIsForget }) {
           </div>
           {count > 0 ? (
             <p className=" mt-5 text-blue-500 font-semibold cursor-default">
-              Please wait for {count} sec
+              Time left to verify OTP {count} sec
             </p>
           ) : null}
         </div>

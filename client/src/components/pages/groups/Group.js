@@ -21,6 +21,7 @@ function Group() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
+  const USER = useSelector((state) => state.global.user);
   const GROUPS = useSelector((state) => state.global.groups);
   const EXPENSES = useSelector((state) => state.global.expenses);
   const currentGroup = GROUPS.find((e) => e._id === id);
@@ -29,6 +30,22 @@ function Group() {
   const [isGroupInfoLoading, setIsGroupInfoLoading] = useState(false);
   // expanse popup toggle
   const [showAddExpencePopUp, setShowAddExpencePopUp] = useState(false);
+  // alert
+  const [alertPopUp, setAlertPopUp] = useState({
+    display: false,
+    alertMessage: "",
+    type: "",
+  });
+
+  // handle alert
+  function handleAlert(display, alertMessage, type) {
+    setAlertPopUp({ display, alertMessage, type });
+    setTimeout(
+      () => setAlertPopUp({ display: false, alertMessage: "", type: "" }),
+      5000
+    );
+  }
+
   function groupImg() {
     if (currentGroup.groupType == "Home") return Home;
     if (currentGroup.groupType == "Trip") return Trip;
@@ -45,7 +62,12 @@ function Group() {
     try {
       const response = await axios({
         method: "get",
-        url: URL + "/api/get_expenceData?groupId=" + currentGroup._id,
+        url:
+          URL +
+          "/api/get_expenceData?groupId=" +
+          currentGroup._id +
+          "&userId=" +
+          USER._id,
       });
       const data = await response.data;
       dispatch(expenses(data));
@@ -96,6 +118,8 @@ function Group() {
                       <GroupExpenceListItem
                         expenseDetail={expense}
                         groupCreatorEmail={currentGroup.creator.email}
+                        type={"GROUP"}
+                        handleAlert={handleAlert}
                       />
                     </li>
                   );
@@ -118,6 +142,28 @@ function Group() {
         currentGroup={currentGroup}
         setReloadGroupExpenseData={setReloadGroupExpenseData}
       />
+
+      {alertPopUp.display ? (
+        <dir className="Alert absolute bottom-0  left-0 z-40">
+          <div
+            className={
+              (alertPopUp.type == "warning" &&
+                "p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800") ||
+              (alertPopUp.type == "error" &&
+                "p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800") ||
+              (alertPopUp.type == "success" &&
+                "p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800")
+            }
+            // className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800"
+            role="alert"
+          >
+            <span className="font-medium">
+              {alertPopUp.type.toUpperCase()} alert!
+            </span>{" "}
+            {alertPopUp.alertMessage}
+          </div>
+        </dir>
+      ) : null}
     </>
   );
 }

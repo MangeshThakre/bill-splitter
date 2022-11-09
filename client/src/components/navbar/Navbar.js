@@ -96,7 +96,9 @@ function Navbar({ loading }) {
       <nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5   w-full  rounded dark:bg-gray-900">
         <div className=" flex justify-between items-center   px-12 ">
           <div
-            onClick={() => navigate("/")}
+            onClick={() =>
+              USER.email ? navigate("/all_expenses") : navigate("/")
+            }
             className="flex items-center   cursor-pointer "
           >
             <img src={logo} className="mr-3 h-6 sm:h-9" alt="Flowbite Logo" />

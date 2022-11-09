@@ -5,11 +5,20 @@ import { useState } from "react";
 import axios from "axios";
 import { user } from "../../../redux/globalSplice";
 import Group from "./Group";
+
 import { expenses } from "../../../redux/globalSplice";
 // image
 import loading from "../../../asset/loading.svg";
 
-function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
+// popup
+import RemoveExpensePopUp from "../../popup/RemoveExpensePopUp";
+
+function GroupExpenceListItem({
+  expenseDetail,
+  groupCreatorEmail,
+  type,
+  handleAlert,
+}) {
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
@@ -22,6 +31,8 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
   const date = new Date(expenseDetail.createdAt);
   const mounth = date.toLocaleString("default", { month: "long" });
   const expanceDate = new Date(expenseDetail.createdAt).getDate();
+  //  toggle remove setteled popUp
+  const [isremoveExpense, setIsRemoveExpense] = useState(false);
 
   // loading
   const [isSettleExpenseLoading, setSettleExpenseLoading] = useState(false);
@@ -123,6 +134,25 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
     );
   }
 
+  // show remove button
+  function showRemoveButton() {
+    if (type == "GROUP" && groupCreatorEmail === USER.email) return true;
+    else return false;
+  }
+
+  // handleRemove expense
+  function handleRemoveExpense() {
+    const isSettled = expenseDetail.memberArr.every((e) => e.isSettled);
+    if (isSettled) return setIsRemoveExpense(isSettled);
+    else if (!isSettled) {
+      return handleAlert(
+        true,
+        "you canot remove this expsnse , this expense is not setteled",
+        "warning"
+      );
+    }
+  }
+
   const LOADING = (
     <div className="absolute bg-[#f1f2f3] h-full w-full left-0 top-0 flex justify-center items-center">
       <img src={loading} alt="loading" />
@@ -130,94 +160,122 @@ function GroupExpenceListItem({ expenseDetail, groupCreatorEmail }) {
   );
 
   return (
-    <div className="border-b-2 border-gray-300 ">
-      {/* head */}
-      <div
-        onClick={() => setShowBody((prevVal) => !prevVal)}
-        className="py-2 px-6  mx-1 bg-gray-200 hover:bg-blue-100 cursor-pointer flex justify-between"
-      >
-        {/* left */}
-        <div className="flex gap-3 items-center">
-          <span>
-            <p className="font-semibold text-xl">{expanceDate}</p>
-            <p>{mounth}</p>
-          </span>
-          <p className="ml-5 text-lg font-semibold">
-            {expenseDetail.expanseDescription}
-          </p>
-        </div>
-        {/* right */}
-        <div className="flex items-center gap-5">
-          <div className=" w-32">
-            <p className="    text-gray ">{handlePaidBy()} paid </p>
-            <p className="text-xl font-semibold">
-              &#x20b9; {expenseDetail.amount.toFixed(2)}
-            </p>
+    <>
+      <div className="border-b-2 border-gray-300 ">
+        {/* head */}
+        <div className="py-2 px-6  mx-1 bg-gray-200 hover:bg-blue-100 cursor-pointer flex items-center justify-between">
+          <div
+            onClick={() => setShowBody((prevVal) => !prevVal)}
+            className=" flex justify-between flex-1 w-full"
+          >
+            {/* left */}
+            <div className="flex gap-3 items-center">
+              <span>
+                <p className="font-semibold text-xl">{expanceDate}</p>
+                <p>{mounth}</p>
+              </span>
+              <p className="ml-5 text-lg font-semibold">
+                {expenseDetail.expanseDescription}
+              </p>
+            </div>
+            {/* right */}
+            <div className="flex items-center gap-5">
+              <div className=" w-32">
+                <p className="    text-gray ">{handlePaidBy()} paid </p>
+                <p className="text-xl font-semibold">
+                  &#x20b9; {expenseDetail.amount.toFixed(2)}
+                </p>
+              </div>
+              <div className="w-32">
+                <p className="text-gray ">{handlePaidBy()} lent </p>
+                <p className="text-xl font-semibold">
+                  &#x20b9; {handleLentMoney().toFixed(2)}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="w-32">
-            <p className="text-gray ">{handlePaidBy()} lent </p>
-            <p className="text-xl font-semibold">
-              &#x20b9; {handleLentMoney().toFixed(2)}
-            </p>
-          </div>
-          <div>button</div>
-        </div>
-      </div>
-      {/* body */}
-      {showBody ? (
-        <div className="px-5 flex justify-between     relative items-end  ">
-          <ul className="w-[40%]">
-            {currentExpenceMemberArr.map((member, i) => {
-              return (
-                <li className="my-3 flex w-full justify-between" key={i}>
-                  {/* list left */}
-                  <div>
-                    <p className="mr-4 text-xl">{member.name}</p>
-                    <span>
-                      {member.email == expenseDetail.paidBy.email ? (
-                        <span className="italic font-semibold">
-                          paid &#x20b9;
-                          {expenseDetail.amount.toFixed(2)}
-                        </span>
-                      ) : (
-                        <span className="italic font-semibold  text-gray-600 ">
-                          owes &#x20b9;{member.amountLeft.toFixed(2)}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  {/* list reight */}
-                  <div className="w-[6rem] text-center">
-                    {/* settel button */}
-                    {member.email !== USER.email && // from current user
-                    USER.email == expenseDetail.paidBy.email &&
-                    !member.isSettled
-                      ? settleButton(expenseDetail.id, member.email)
-                      : null}
 
-                    {/* settled message */}
-                    {expenseDetail.paidBy.email !== member.email &&
-                    member.isSettled ? (
-                      <span className="text-gray-600   font-semibold">
-                        ✅ Settled
+          {/* remove button */}
+          <div>
+            {showRemoveButton() ? (
+              <button
+                type="button"
+                onClick={() => handleRemoveExpense()}
+                className="py-2 px-3 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Remove
+              </button>
+            ) : null}
+          </div>
+          {/* remove button  end*/}
+        </div>
+
+        {/* body */}
+        {showBody ? (
+          <div className="px-5 flex justify-between     relative items-end  ">
+            <ul className="w-[40%]">
+              {currentExpenceMemberArr.map((member, i) => {
+                return (
+                  <li className="my-3 flex w-full justify-between" key={i}>
+                    {/* list left */}
+                    <div>
+                      <p className="mr-4 text-xl">{member.name}</p>
+                      <span>
+                        {member.email == expenseDetail.paidBy.email ? (
+                          <span className="italic font-semibold">
+                            paid &#x20b9;
+                            {expenseDetail.amount.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="italic font-semibold  text-gray-600 ">
+                            owes &#x20b9;{member.amountLeft.toFixed(2)}
+                          </span>
+                        )}
                       </span>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                    </div>
+                    {/* list reight */}
+                    <div className="w-[6rem] text-center">
+                      {/* settel button */}
+                      {member.email !== USER.email && // from current user
+                      USER.email == expenseDetail.paidBy.email &&
+                      !member.isSettled
+                        ? settleButton(expenseDetail.id, member.email)
+                        : null}
 
-          <div className="h-full flex items-center">
-            {handledIsSettelButton() == "settle"
-              ? settleButton(expenseDetail.id, USER.email)
-              : null}
+                      {/* settled message */}
+                      {expenseDetail.paidBy.email !== member.email &&
+                      member.isSettled ? (
+                        <span className="text-gray-600   font-semibold">
+                          ✅ Settled
+                        </span>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="h-full flex items-center">
+              {handledIsSettelButton() == "settle"
+                ? settleButton(expenseDetail.id, USER.email)
+                : null}
+            </div>
+
+            {isSettleExpenseLoading ? LOADING : null}
           </div>
-          {isSettleExpenseLoading ? LOADING : null}
-        </div>
+        ) : null}
+        {/* body end */}
+      </div>
+
+      {isremoveExpense ? (
+        <RemoveExpensePopUp
+          isremoveExpense={isremoveExpense}
+          setIsRemoveExpense={setIsRemoveExpense}
+          expenseDetail={expenseDetail}
+          handleAlert={handleAlert}
+        />
       ) : null}
-      {/* body end */}
-    </div>
+    </>
   );
 }
 

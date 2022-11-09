@@ -42,4 +42,6 @@ router.delete("/delete_friend", controller.delete_friend);
 
 router.delete("/delete_group", controller.delete_group);
 
+router.delete("/remove_expense", controller.remove_expense);
+
 module.exports = router;

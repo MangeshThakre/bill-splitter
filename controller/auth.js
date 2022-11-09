@@ -95,6 +95,17 @@ class AuthController {
     const otp = Math.floor(1000 + Math.random() * 9000);
 
     try {
+      const userExist = await userModel.findOne({ email: userEmail });
+      if (!userExist) {
+        return res
+          .status(401)
+          .json({ error: userEmail + " does not have any account" });
+      } else if (userExist && !userExist.source.includes("local")) {
+        return res.status(401).json({
+          error:
+            "you have not created password for your account and hence you will not able to update password, please try to login with google",
+        });
+      }
       // const transporter = nodemailer.createTransport({
       //   service: "gmail",
       //   port: 465,

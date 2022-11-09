@@ -324,10 +324,50 @@ class controller {
   static async get_groups(req, res) {
     const userEmail = req.query.userEmail;
     try {
-      const groups = await groupModel.find({
-        membersArr: { $elemMatch: { email: userEmail } },
+      const groups = await groupModel.aggregate([
+        {
+          $match: {
+            membersArr: { $elemMatch: { email: userEmail } },
+          },
+        },
+        { $addFields: { userEmail: userEmail } },
+        {
+          $lookup: {
+            from: "friends",
+            localField: "userEmail",
+            foreignField: "email",
+            as: "friends",
+          },
+        },
+        { $unwind: "$friends" },
+      ]);
+
+      function membersArr(membersArr, friendsArr) {
+        const groupMembersArr = [];
+        membersArr.forEach((member) => {
+          const friend = friendsArr.find((e) => e.email == member.email);
+          if (friend) return groupMembersArr.push(friend);
+          else return groupMembersArr.push(member);
+        });
+        return groupMembersArr;
+      }
+      const groupArr = [];
+      groups.forEach((group) => {
+        const groupObj = {};
+        (groupObj["_id"] = group._id),
+          (groupObj["creator"] = group.creator),
+          (groupObj["groupName"] = group.groupName),
+          (groupObj["groupType"] = group.groupType),
+          (groupObj["membersArr"] = membersArr(
+            group.membersArr,
+            group.friends.friendsArr
+          )),
+          (groupObj["createdAt"] = group.createdAt),
+          (groupObj["updatedAt"] = group.updatedAt),
+          groupArr.push(groupObj);
       });
-      res.json({ error: false, data: groups });
+      console.log(groupArr);
+      res.json({ error: false, data: groupArr });
     } catch (error) {
       res.json({ error: true, message: error.message });
     }
@@ -486,10 +526,12 @@ class controller {
   // get group expence data
   static async get_expenceData(req, res) {
     const groupId = mongoose.Types.ObjectId(req.query.groupId);
+    const userId = req.query.userId;
     try {
       const groupDateil = await groupModel.aggregate([
         { $match: { _id: groupId } },
-        { $addFields: { _idStr: { $toString: "$_id" } } },
+        { $addFields: { _idStr: { $toString: "$_id" }, userId: userId } },
+
         {
           $lookup: {
             from: "expenses",
@@ -498,19 +540,31 @@ class controller {
             as: "expensesArr",
           },
         },
+        {
+          $lookup: {
+            from: "friends",
+            localField: "userId",
+            foreignField: "userId",
+            as: "friends",
+          },
+        },
         { $unwind: "$expensesArr" },
+        { $unwind: "$friends" },
       ]);
 
-      function handleMembers(groupMembers, splitWith) {
+      function handleMembers(groupMembers, friends, splitWith) {
         const membersArr = [];
         splitWith.forEach((e, i) => {
+          const memberFromFriends = friends.find(
+            (member) => member.email == e.email
+          );
           const member = groupMembers.find(
             (member) => member.email === e.email
           );
           membersArr.push({
             id: e.email,
-            name: member.name,
-            email: member.email,
+            name: memberFromFriends ? memberFromFriends.name : member.name,
+            email: memberFromFriends ? memberFromFriends.email : member.email,
             amountLeft: e.amountLeft,
             isSettled: e.isSettled,
           });
@@ -526,6 +580,7 @@ class controller {
         const expenceData = {};
         expenceData["memberArr"] = handleMembers(
           group.membersArr,
+          group.friends.friendsArr,
           group.expensesArr.splitWith
         );
         expenceData["expanseDescription"] =
@@ -701,6 +756,18 @@ class controller {
       // all expenses arr
       const allExpenses = [...groupExpeses, ...friendExpenseArr];
       res.status(200).json(allExpenses);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async remove_expense(req, res) {
+    const expenseId = req.query.expenseId;
+    try {
+      const result = await expenseModel.findOneAndRemove({ _id: expenseId });
+      console.log(result);
+      if (result) return res.status(200).json("deleted");
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: error.message });
