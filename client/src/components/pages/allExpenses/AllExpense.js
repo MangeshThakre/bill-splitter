@@ -49,7 +49,7 @@ function AllExpense() {
       setIsAllExpensesLoading(false);
     } catch (error) {
       setIsAllExpensesLoading(false);
-      handleAlert(true, error.message, "error");
+      handleAlert(true, error.response.data.error, "error");
     }
   }
 

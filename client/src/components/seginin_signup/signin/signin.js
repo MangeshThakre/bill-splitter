@@ -26,8 +26,9 @@ function Signin({ handleAlert }) {
       data: { email, password },
     });
     const data = await response.data;
+
     if (!data.error) {
-      window.location.href = "http://localhost:3000";
+      window.location.href = process.env.REACT_APP_URL;
     } else {
       handleAlert(true, data.message, "error");
     }

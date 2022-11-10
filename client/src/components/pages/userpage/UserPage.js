@@ -5,6 +5,7 @@ import CreatePassword from "./CreatePassword.js";
 import Update_ForgetPassword from "./Update_ForgetPassword.js";
 import { useState } from "react";
 import axios from "axios";
+import person from "../../../asset/persion.png";
 function UserPage() {
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
@@ -52,7 +53,7 @@ function UserPage() {
         <div className="  flex justify-end h-20 items-center gap-3 px-4 bg-gray-200">
           <div className="flex-1 ml-auto flex items-center gap-4">
             <img
-              src={USER.profilePhoto}
+              src={USER.profilePhoto ? USER.profilePhoto : person}
               alt="img"
               className="w-12 h-12  rounded-full"
             />
@@ -69,7 +70,7 @@ function UserPage() {
           >
             <img
               className="h-24 w-24 rounded-lg"
-              src={USER.profilePhoto}
+              src={USER.profilePhoto ? USER.profilePhoto : person}
               alt={USER.firstName}
             />
 

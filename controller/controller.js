@@ -728,7 +728,9 @@ class controller {
           },
         },
       ]);
-      const { friendsArr } = await firendsModel.findOne({ userId });
+
+      const friends = await firendsModel.findOne({ userId });
+      const friendsArr = friends ? friends.friendsArr : [];
 
       const personalExpenses = await expenseModel.aggregate([
         { $match: { expenseType: "PRIVATE" } },

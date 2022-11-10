@@ -1,7 +1,9 @@
+require("dotenv").config();
 const mongoose = require("../database.js");
 const userModel = require("../schema/user_schema.js");
 const { genPassword, validPassword } = require("../lib/passportLib.js");
 const md5 = require("md5");
+const nodemailer = require("nodemailer");
 
 class AuthController {
   static singIn(req, res) {
@@ -106,32 +108,31 @@ class AuthController {
             "you have not created password for your account and hence you will not able to update password, please try to login with google",
         });
       }
-      // const transporter = nodemailer.createTransport({
-      //   service: "gmail",
-      //   port: 465,
-      //   secure: true,
-      //   secureConnection: false,
-      //   auth: {
-      //     user: process.env.EMAIL_ID, // generated ethereal user
-      //     pass: process.env.EMAIL_PASS, // generated ethereal password
-      //   },
-      // });
-      // // send email
-      // const mailOptions = {
-      //   from: process.env.EMAIL_ID,
-      //   to: userEmail,
-      //   subject: "Reset password",
-      //   html: `Hello <b>${userEmail}<b>,
-      //                <p>dear <b>user<b/></p>
-      //                ${otp} is your bull-spliter OTP, Pleas do not shere OTP as it is confidential.
-      //             <br>Regards,<br>
-      //             <br>chatapp Team<br>`,
-      // };
-      // transporter.sendMail(mailOptions, (error, info) => {
-      //   if (error) res.status(500).json({ error: error.message });
-      //   res.status(200).json({ otp: md5(otp) });
-      // });
-      res.status(200).json({ otp: md5(2000) });
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        port: 465,
+        secure: true,
+        secureConnection: false,
+        auth: {
+          user: process.env.EMAIL_ID, // generated ethereal user
+          pass: process.env.EMAIL_PASS, // generated ethereal password
+        },
+      });
+      // send email
+      const mailOptions = {
+        from: process.env.EMAIL_ID,
+        to: userEmail,
+        subject: "Reset password",
+        html: `Hello <b>${userEmail}<b>,
+                     <p>dear <b>user<b/></p>
+                     ${otp} is your bull-spliter OTP, Pleas do not shere OTP as it is confidential.
+                  <br>Regards,<br>
+                  <br>chatapp Team<br>`,
+      };
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) res.status(500).json({ error: error.message });
+        res.status(200).json({ otp: md5(otp) });
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

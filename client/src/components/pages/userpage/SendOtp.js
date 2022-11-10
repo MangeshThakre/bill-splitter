@@ -28,7 +28,6 @@ function SendOtp({ handleAlert, setVerify, isForget, setIsForget }) {
   }, [count]);
 
   async function ResendOTP() {
-    setCount(60);
     setIsSetOtpLoading(true);
     try {
       const response = await axios({
@@ -38,6 +37,7 @@ function SendOtp({ handleAlert, setVerify, isForget, setIsForget }) {
       const data = await response.data;
       setSErverOTP(data.otp);
       setIsSetOtpLoading(false);
+      setCount(60);
       return handleAlert(
         true,
         `please verify OTP sent on ${USER.email}`,

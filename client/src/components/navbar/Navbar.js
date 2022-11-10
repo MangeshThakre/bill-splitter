@@ -1,10 +1,12 @@
 import React from "react";
 import "./Navbar.css";
+import person from "../../asset/persion.png";
 import { useState } from "react";
 import logo from "../../asset/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+
 function Navbar({ loading }) {
   let navigate = useNavigate();
   const USER = useSelector((state) => state.global.user);
@@ -72,7 +74,7 @@ function Navbar({ loading }) {
       <div className="flex-shrink-0">
         <img
           className="w-8 h-8 rounded-full"
-          src={USER.profilePhoto}
+          src={USER.profilePhoto ? USER.profilePhoto : person}
           alt="Neil image"
         />
       </div>
