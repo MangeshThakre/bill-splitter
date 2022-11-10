@@ -103,28 +103,16 @@ class controller {
 
   // add friend
   static async add_friend(req, res) {
-    const isNewcollection = req.body.isNewcollection;
     const user = req.body.user;
     const firendArr = [req.body.friend];
-    const friendInfo = new firendsModel({
-      name: user.userName,
-      email: user.userEmail,
-      userId: user.userId,
-      friendsArr: firendArr,
-    });
 
     try {
-      if (isNewcollection) {
-        const result = await friendInfo.save();
-        res.status(200).json({ friendsArr: result.friendsArr });
-      } else {
-        const result = await firendsModel.findOneAndUpdate(
-          { userId: user.userId },
-          { $push: { friendsArr: { $each: firendArr } } },
-          { returnOriginal: false }
-        );
-        res.status(200).json({ friendsArr: result.friendsArr });
-      }
+      const result = await firendsModel.findOneAndUpdate(
+        { userId: user.userId },
+        { $push: { friendsArr: { $each: firendArr } } },
+        { returnOriginal: false }
+      );
+      res.status(200).json({ friendsArr: result.friendsArr });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -351,6 +339,7 @@ class controller {
         });
         return groupMembersArr;
       }
+
       const groupArr = [];
       groups.forEach((group) => {
         const groupObj = {};

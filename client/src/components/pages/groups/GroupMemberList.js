@@ -27,7 +27,6 @@ export default function GroupMemberList({ currentMember }) {
         data: {
           user,
           friend: { name: currentMember.name, email: currentMember.email },
-          isNewcollection: FRIENDS.length < 1 ? true : false,
         },
       });
       const { friendsArr } = await response.data;
@@ -39,6 +38,10 @@ export default function GroupMemberList({ currentMember }) {
       console.log(error);
       alert(error.message);
     }
+  }
+  function nameSplice(name) {
+    if (name.length > 15) return name.slice(0, 15) + "...";
+    else return name;
   }
 
   function handleAddFriendButton() {
@@ -95,7 +98,9 @@ export default function GroupMemberList({ currentMember }) {
           ></path>
         </svg>
         <p className="font-semibold text-gray-600">
-          {USER.email == currentMember.email ? "You" : currentMember.name}
+          {USER.email == currentMember.email
+            ? "You"
+            : nameSplice(currentMember.name)}
         </p>
       </div>
       {/* dropdown */}

@@ -1,5 +1,6 @@
 const userModel = require("./schema/user_schema.js");
 const passport = require("passport");
+const firendsModel = require("./schema/friendsSchema.js");
 const { genPassword, validPassword } = require("./lib/passportLib.js");
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -107,6 +108,13 @@ passport.use(
           });
           const result = await saveUserInfo.save();
 
+          const friendInfo = new firendsModel({
+            name: firstName + " " + lastName,
+            email: email,
+            userId: result._id,
+            friendsArr: [],
+          });
+          await friendInfo.save();
           return done(null, result);
         }
       } catch (error) {

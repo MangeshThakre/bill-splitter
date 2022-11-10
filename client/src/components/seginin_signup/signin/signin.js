@@ -38,6 +38,7 @@ function Signin({ handleAlert }) {
       setIsLoginLoading(false);
     } catch (error) {
       setIsLoginLoading(false);
+      console.log(error);
       return handleAlert(true, error.message, "error");
     }
   }

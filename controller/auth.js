@@ -44,6 +44,14 @@ class AuthController {
       source: ["local"],
     });
     const result = await userInfo.save();
+
+    const friendInfo = new firendsModel({
+      name: firstName + " " + lastName,
+      email: email,
+      userId: result._id,
+      friendsArr: [],
+    });
+    await friendInfo.save();
     res.status(200).json({ error: false, data: result });
   }
 

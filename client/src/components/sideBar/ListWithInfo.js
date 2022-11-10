@@ -15,6 +15,11 @@ function ListWithInfo({ listInfo, type }) {
     if (type == "Other") return Other;
   }
 
+  function nameSplice(name) {
+    if (name.length > 15) return name.slice(0, 15) + "...";
+    else return name;
+  }
+
   return (
     <>
       {listInfo.map((e, i) => {
@@ -48,7 +53,9 @@ function ListWithInfo({ listInfo, type }) {
               )}
 
               <p className="font-semibold text-gray-600">
-                {type == "friend" ? e.name : e.groupName}
+                {type == "friend"
+                  ? nameSplice(e.name)
+                  : nameSplice(e.groupName)}
               </p>
             </Link>
           </li>

@@ -17,7 +17,6 @@ function ExpenseList({ expenseDetail }) {
     if (expenseDetail.groupType == "Other") return Other;
   }
 
-  console.log(expenseDetail);
   return (
     <div className=" bg-gray-300 h-28 mx-2 rounded-md  flex items-center  justify-between px-5 py-2">
       <div className=" flex gap-3  items-center    ">
