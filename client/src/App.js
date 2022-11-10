@@ -8,6 +8,7 @@ import { user } from "./redux/globalSplice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import loadingSvg from "./asset/loading.svg";
+import Home from "./components/pages/Home/Home.js";
 
 import Sidebar from "./components/sideBar/sidebar";
 // pages
@@ -66,12 +67,13 @@ function App() {
                 exact
                 path="/signup"
                 element={<SignIn_singUp page={"signup"} />}
-              />
+              />{" "}
               <Route
-                exect
+                exact
                 path="/forget_password"
                 element={<SignIn_singUp page={"forget_password"} />}
               />
+              <Route exect path="/" element={<Home />} />
             </Routes>
           ) : (
             <div className="pt-20 h-full flex">

@@ -3,6 +3,8 @@ import Signin from "./signin/signin";
 import Signup from "./signup/signup.js";
 import { useState } from "react";
 import ForgetPassword from "./ForgetPassword";
+import work from "../../asset/work.png";
+
 function Index({ page }) {
   const [alertPopUp, setAlertPopUp] = useState({
     display: false,
@@ -19,9 +21,9 @@ function Index({ page }) {
   }
 
   return (
-    <div className="  flex justify-center  h-[100%] w-[90%]">
-      <div className="sm:hidden md:block   flex  justify-center items-center md:w-1/2 ">
-        left
+    <div className="flex justify-center  h-[100%] w-[100%] px-12">
+      <div className="hidden md:flex   justify-center items-center md:w-1/2 ">
+        <img src={work} alt="img" className="w-[25rem]   mt-20" />
       </div>
       <div className=" md:w-1/2 mt-20  flex justify-center items-center ">
         {page === "signin" ? (
