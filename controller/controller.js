@@ -366,7 +366,6 @@ class controller {
           (groupObj["updatedAt"] = group.updatedAt),
           groupArr.push(groupObj);
       });
-      console.log(groupArr);
       res.json({ error: false, data: groupArr });
     } catch (error) {
       res.json({ error: true, message: error.message });

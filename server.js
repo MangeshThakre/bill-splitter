@@ -16,8 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",
-      "http://localhost:8081",
+      // "http://localhost:3000",
+      // "http://localhost:8081",
       "https://bill-spliter-mern-app.up.railway.app",
     ],
     methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
