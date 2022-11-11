@@ -49,6 +49,7 @@ router.post("/singup", authcontroller.signUp);
 
 // createpass
 router.post("/create_password", authcontroller.create_password);
+
 // update password
 router.post("/update_password", authcontroller.update_password);
 

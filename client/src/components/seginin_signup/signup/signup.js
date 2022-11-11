@@ -43,7 +43,7 @@ function Signup({ handleAlert }) {
   }
 
   async function google() {
-    window.open(URL + "/auth/google/callback", "_self");
+    window.open(URL + "/auth/google", "_self");
   }
 
   return (

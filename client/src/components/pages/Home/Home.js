@@ -13,7 +13,7 @@ function Home() {
         </div>
         <div>
           <h2 className="mb-2 text-2xl font-bold text-blue-900 dark:text-white">
-            About Bill Spliter
+            About Bill Splitter
           </h2>
           <ul className="space-y-1 max-w-md list-inside text-gray-500 dark:text-gray-400">
             <li className="flex items-center">
