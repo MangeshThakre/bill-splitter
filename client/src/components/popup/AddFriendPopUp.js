@@ -197,7 +197,7 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
                       htmlFor="name"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                     >
-                      Your Name
+                      Name
                     </label>
                     <input
                       type="text"
@@ -215,7 +215,7 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
                       htmlFor="email"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                     >
-                      Your email
+                      Email
                     </label>
                     <input
                       type="email"

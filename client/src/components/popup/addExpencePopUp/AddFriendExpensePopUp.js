@@ -150,7 +150,7 @@ function AddFriendExpensePopUp({
 
                   {/* info */}
                   <div className="flex justify-center items-center my-10 flex-col gap-3">
-                    <span className="italic">
+                    <span className="italic text-center">
                       Paid by
                       <button
                         type="button"

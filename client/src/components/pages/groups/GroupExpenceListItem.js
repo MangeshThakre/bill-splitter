@@ -48,7 +48,10 @@ function GroupExpenceListItem({
         ".";
     }
     if (expenseDetail.paidBy.email === USER.email) return "You";
-    else return paidByName;
+    else
+      return paidByName.length > 10
+        ? paidByName.slice(0, 10) + "..."
+        : paidByName;
   }
 
   function handleLentMoney() {
@@ -181,13 +184,19 @@ function GroupExpenceListItem({
             {/* right */}
             <div className="flex items-center gap-5">
               <div className=" w-32">
-                <p className="    text-gray ">{handlePaidBy()} paid </p>
+                <p className="    text-gray ">
+                  {handlePaidBy()}{" "}
+                  <span className="font-bold text-green-600">paid</span>{" "}
+                </p>
                 <p className="text-xl font-semibold">
                   &#x20b9; {expenseDetail.amount.toFixed(2)}
                 </p>
               </div>
               <div className="w-32">
-                <p className="text-gray ">{handlePaidBy()} lent </p>
+                <p className="text-gray ">
+                  {handlePaidBy()}{" "}
+                  <span className="font-bold text-blue-600">lent</span>{" "}
+                </p>
                 <p className="text-xl font-semibold">
                   &#x20b9; {handleLentMoney().toFixed(2)}
                 </p>
