@@ -79,7 +79,7 @@ function Home() {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              <p className="text-lg ">At least one lowercase character</p>
+              <p className="text-lg ">Log of all expenses</p>
             </li>
             <li className="  flex gap-7">
               <button
