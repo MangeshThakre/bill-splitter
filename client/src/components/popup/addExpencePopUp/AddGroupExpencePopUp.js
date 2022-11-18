@@ -19,6 +19,7 @@ function AddGroupExpencePopUp({
   setShowAddExpencePopUp,
   currentGroup,
   setReloadGroupExpenseData,
+  handleAlert,
 }) {
   const dispatch = useDispatch();
   const URL = process.env.REACT_APP_URL;
@@ -54,7 +55,6 @@ function AddGroupExpencePopUp({
   async function handleAddExpanse(e) {
     e.preventDefault();
     const expanseDescription = e.target[0].value;
-    setIsSaveExpenceLoading(true);
     const splitWithArr = splitWith.map((e) => {
       return {
         email: e,
@@ -62,6 +62,11 @@ function AddGroupExpencePopUp({
         isSettled: e == paidBy.email ? true : false,
       };
     });
+
+    if (splitWith.length < 2) {
+      return handleAlert(true, "minimum 2 members required", "warning");
+    }
+    setIsSaveExpenceLoading(true);
     try {
       const response = await axios({
         method: "post",
@@ -79,9 +84,17 @@ function AddGroupExpencePopUp({
       setShowAddExpencePopUp(false);
       setReloadGroupExpenseData((prevVal) => !prevVal);
       setIsSaveExpenceLoading(false);
+      setSecondaryPopUp(null);
+      return handleAlert(
+        true,
+        `successfuly created expense ${expanseDescription}`,
+        "success"
+      );
     } catch (error) {
       setIsSaveExpenceLoading(false);
-      console.log(error);
+      setSecondaryPopUp(null);
+      return handleAlert(true, error.message, "error");
+      // console.log(error);
       // alert(error);
     }
   }

@@ -150,7 +150,7 @@ function GroupExpenceListItem({
     else if (!isSettled) {
       return handleAlert(
         true,
-        "you canot remove this expense , this expense is not setteled",
+        "you canot remove this expense , this expense is not setteled yet",
         "warning"
       );
     }

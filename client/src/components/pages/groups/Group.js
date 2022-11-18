@@ -141,10 +141,11 @@ function Group() {
         setShowAddExpencePopUp={setShowAddExpencePopUp}
         currentGroup={currentGroup}
         setReloadGroupExpenseData={setReloadGroupExpenseData}
+        handleAlert={handleAlert}
       />
 
       {alertPopUp.display ? (
-        <dir className="Alert absolute bottom-0  left-0 z-40">
+        <dir className="Alert absolute bottom-0  left-0 z-50">
           <div
             className={
               (alertPopUp.type == "warning" &&
