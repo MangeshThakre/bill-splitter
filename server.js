@@ -61,27 +61,22 @@ require("./pasport.js");
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use((req, res, next) => {
-//   console.log("server session", req.session);
-//   console.log("server  user", req.user);
-//   next();
-// });
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client/build")));
-  //  router
-  app.use("/auth", authRoute);
-  app.use("/api", router);
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-  });
-} else {
-  app.get("/", (req, res) => {
-    res.send("app is runing successfully");
-  });
-  app.use("/auth", authRoute);
-  app.use("/api", router);
-}
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "client/build")));
+//   //  router
+//   app.use("/auth", authRoute);
+//   app.use("/api", router);
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+//   });
+// }
+// else {
+app.get("/", (req, res) => {
+  res.status(200).json({ success: true, data: "bull spliter server" });
+});
+app.use("/auth", authRoute);
+app.use("/api", router);
+// }
 
 app.use((err, req, res, dome) => {
   if (err) console.log("server.js", err);
