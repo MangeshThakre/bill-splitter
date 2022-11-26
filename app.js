@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
-      "https://bill-spliter-mern-app.cyclic.app",
+      "https://bill-splitter-fsjs.cyclic.app",
       "http://localhost:3000",
       "http://localhost:8081",
     ],
