@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-
+const path = require("path");
 const passport = require("passport");
 const cors = require("cors");
 const expressSession = require("express-session");
@@ -16,8 +16,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
-      "https://bill-splitter-frontend.vercel.app",
+      "https://bill-spliter-mern-app.cyclic.app",
       "http://localhost:3000",
+      "http://localhost:8081",
     ],
     methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
     credentials: true,
@@ -63,12 +64,21 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// all routers
-app.get("/", (req, res) => {
-  res.status(200).json({ success: true, data: "bull spliter server" });
-});
-app.use("/auth", authRoute);
-app.use("/api", router);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+  app.use("/auth", authRoute);
+  app.use("/api", router);
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+} else {
+  // all routers
+  app.use("/auth", authRoute);
+  app.use("/api", router);
+  app.get("/", (req, res) => {
+    res.status(200).json({ success: true, data: "bull spliter server" });
+  });
+}
 
 app.use((err, req, res, dome) => {
   if (err) console.log("server.js", err);

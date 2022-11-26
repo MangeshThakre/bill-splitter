@@ -37,7 +37,7 @@ router.get("/google", passport.authenticate("google", ["profile", "email"]));
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login",
+    failureRedirect: "/signin",
     successRedirect: process.env.APP_URL,
   })
 );
