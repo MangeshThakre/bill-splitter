@@ -26,7 +26,6 @@ const customfield = {
 const verifyLocalStrategy = async function (req, email, password, done) {
   try {
     const user = await userModel.findOne({ email });
-
     // if user does not exist show warning
     if (!user) {
       return done(null, {
@@ -57,6 +56,7 @@ const verifyLocalStrategy = async function (req, email, password, done) {
 
 const locStrategy = new LocalStrategy(customfield, verifyLocalStrategy);
 passport.use(locStrategy);
+
 
 // Google startegy
 passport.use(
@@ -96,6 +96,7 @@ passport.use(
             );
             return done(null, updatedUser);
           }
+
           return done(null, user);
         } else if (!user) {
           const saveUserInfo = new userModel({
