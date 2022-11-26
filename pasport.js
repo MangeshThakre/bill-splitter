@@ -57,7 +57,6 @@ const verifyLocalStrategy = async function (req, email, password, done) {
 const locStrategy = new LocalStrategy(customfield, verifyLocalStrategy);
 passport.use(locStrategy);
 
-
 // Google startegy
 passport.use(
   new GoogleStrategy(

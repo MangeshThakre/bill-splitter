@@ -39,9 +39,7 @@ router.get(
   passport.authenticate("google", {
     failureRedirect: "/login",
     successRedirect: process.env.APP_URL,
-  }),
-
-  authcontroller.singIn
+  })
 );
 
 // SIGN-UP
