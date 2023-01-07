@@ -43,7 +43,7 @@ function Friends() {
           "&userId=" +
           USER._id +
           "&friend=" +
-          currentFriend.email,
+          currentFriend.email
       });
       const data = await response.data;
       dispatch(expenses(data));

@@ -9,7 +9,7 @@ export default function GroupMemberList({ currentMember }) {
   const URL = process.env.REACT_APP_URL;
   const [isAddFriendLoading, setIsAddFriendLoading] = useState(false);
   const [isFriend, setIsFriend] = useState(
-    FRIENDS.some((e) => e.email == currentMember.email)
+    FRIENDS.some((e) => e.email === currentMember.email)
   );
 
   async function handleAddFriend() {
@@ -18,7 +18,7 @@ export default function GroupMemberList({ currentMember }) {
     let user = {
       userName: USER.firstName + " " + USER.lastName,
       userEmail: USER.email,
-      userId: USER._id,
+      userId: USER._id
     };
     try {
       const response = await axios({
@@ -26,8 +26,8 @@ export default function GroupMemberList({ currentMember }) {
         url: URL + "/api/add_friend",
         data: {
           user,
-          friend: { name: currentMember.name, email: currentMember.email },
-        },
+          friend: { name: currentMember.name, email: currentMember.email }
+        }
       });
       const { friendsArr } = await response.data;
       dispatch(friends(friendsArr));
@@ -103,8 +103,10 @@ export default function GroupMemberList({ currentMember }) {
             : nameSplice(currentMember.name)}
         </p>
       </div>
-      {/* dropdown */}
+      {/* group member name end */}
+      {/* add friend button */}
       {USER.email === currentMember.email ? null : handleAddFriendButton()}
+      {/* add friend button  end*/}
     </div>
   );
 }

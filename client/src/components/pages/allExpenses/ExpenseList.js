@@ -18,7 +18,7 @@ function ExpenseList({ expenseDetail }) {
   }
 
   return (
-    <div className=" bg-gray-300 h-28 mx-2 rounded-md  flex items-center  justify-between px-5 py-2">
+    <div className=" bg-gray-300 h-28 mx-2 rounded-md  flex items-center  justify-between px-5 py-2 shadow-xl">
       <div className=" flex gap-3  items-center    ">
         <img
           className="h-16 w-16 rounded-full"

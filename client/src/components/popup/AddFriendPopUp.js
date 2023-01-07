@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { friends } from "../../redux/globalSplice.js";
+import { friends, groups } from "../../redux/globalSplice.js";
 import { useParams, useNavigate } from "react-router-dom";
+import Group from "../pages/groups/Group.js";
 
 function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
   const navigate = useNavigate();
@@ -11,20 +12,23 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
   const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
   const FRIENDS = useSelector((state) => state.global.friends);
+  const GROUPS = useSelector((state) => state.global.groups);
   const [isAddFriendLoading, setIsAddFriendLoading] = useState(false);
   const [isDeleteFriendLoading, setIsDeletefriendLoading] = useState(false);
   const [currentFriend, setCurrentFriend] = useState(
     FRIENDS.find((e) => e.email == email)
   );
+
   useEffect(
     () => setCurrentFriend(FRIENDS.find((e) => e.email == email)),
     [FRIENDS]
   );
+
   const [friendPopAlert, setFriendPopAlert] = useState({
     showAlert: false,
     alertMessage: "",
     time: 0,
-    type: "",
+    type: ""
   });
 
   function handleAlert(message, time, type) {
@@ -34,14 +38,13 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
         showAlert: false,
         alertMessage: "",
         time: 0,
-        type: "",
+        type: ""
       });
       clearTimeout(showalert);
     }, time);
   }
 
   /// update friend
-
   async function handleUpdateFriend(e) {
     e.preventDefault();
     const name = e.target[0].value;
@@ -51,10 +54,24 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
       const response = await axios({
         method: "put",
         url: URL + "/api/update_friend",
-        data: { friend: { name, email }, userId: USER._id },
+        data: { friend: { name, email }, userId: USER._id }
       });
       const { friendsArr } = await response.data;
       dispatch(friends(friendsArr));
+
+      const updatedMemberGroup = GROUPS.map((group) => {
+        if (group.membersArr.some((member) => member.email === email)) {
+          return {
+            ...group,
+            membersArr: group.membersArr.map((member) =>
+              member.email === email ? { ...member, name: name } : member
+            )
+          };
+        } else return group;
+      });
+
+      dispatch(groups(updatedMemberGroup));
+
       setIsAddFriendLoading(false);
       setShowAddFreindpopUp(false);
       return handleAlert(
@@ -69,7 +86,6 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
   }
 
   // Add friend
-
   async function handleAddFriend(e) {
     e.preventDefault();
     const name = e.target[0].value;
@@ -81,7 +97,7 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
     const user = {
       name: USER.firstName + " " + USER.lastName,
       email: USER.email,
-      userId: USER._id,
+      userId: USER._id
     };
     const isNewcollection = FRIENDS.length < 1 ? true : false;
     setIsAddFriendLoading(true);
@@ -89,7 +105,7 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
       const response = await axios({
         method: "post",
         url: URL + "/api/add_friend",
-        data: { friend: { name, email }, user, isNewcollection },
+        data: { friend: { name, email }, user, isNewcollection }
       });
 
       const { friendsArr } = await response.data;
@@ -109,7 +125,6 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
   }
 
   // Delete friend
-
   async function handleDeleteFriend(e) {
     setIsDeletefriendLoading(true);
     try {
@@ -120,7 +135,7 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
           "/api/delete_friend?userId=" +
           USER._id +
           "&friendEmail=" +
-          email,
+          email
       });
       const { friendsArr } = await response.data;
       dispatch(friends(friendsArr));
@@ -129,12 +144,6 @@ function AddFriendPopUp({ showAddFreindpopUp, setShowAddFreindpopUp, isEdit }) {
       navigate("/all_expenses");
       return handleAlert(
         `successfuly remove ${currentFriend.name} from friend list`,
-        5000,
-        "success"
-      );
-
-      return handleAlert(
-        `Successfuly remove  ${currentFriend.name} from friend list`,
         5000,
         "success"
       );

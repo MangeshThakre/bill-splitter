@@ -34,7 +34,7 @@ function Group() {
   const [alertPopUp, setAlertPopUp] = useState({
     display: false,
     alertMessage: "",
-    type: "",
+    type: ""
   });
 
   // handle alert
@@ -67,7 +67,7 @@ function Group() {
           "/api/get_expenceData?groupId=" +
           currentGroup._id +
           "&userId=" +
-          USER._id,
+          USER._id
       });
       const data = await response.data;
       dispatch(expenses(data));
@@ -135,7 +135,10 @@ function Group() {
 
         {/* body end */}
       </div>
-      <RightSideBar currentGroup={currentGroup} />
+      <RightSideBar
+        currentGroup={currentGroup}
+        isGroupInfoLoading={isGroupInfoLoading}
+      />
       <AddGroupExpencePopUp
         showAddExpencePopUp={showAddExpencePopUp}
         setShowAddExpencePopUp={setShowAddExpencePopUp}

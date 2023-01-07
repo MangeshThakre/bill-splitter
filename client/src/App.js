@@ -29,7 +29,7 @@ function App() {
       const response = await axios({
         method: "get",
         url: URL + "/auth/login/success",
-        withCredentials: true,
+        withCredentials: true
       });
       const data = await response.data.user;
       dispatch(user(data));
@@ -78,13 +78,12 @@ function App() {
           ) : (
             <div className="pt-20 h-full flex">
               <Sidebar />
-              <div className="w-full  flex">
+              <div className="w-full flex ">
                 <Routes>
                   <Route path="/all_expenses" element={<AllExpense />} />
                   <Route path="/users" element={<UserPage />} />
                   <Route path="/group/:id" element={<Group />} />
                   <Route path="/friend/:email" element={<Friend />} />
-
                   <Route path="*" element={<div>page not found</div>} />
                 </Routes>
               </div>

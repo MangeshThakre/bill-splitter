@@ -18,10 +18,10 @@ app.use(
     origin: [
       "https://bill-splitter-fsjs.cyclic.app",
       "http://localhost:3000",
-      "http://localhost:8081",
+      "http://localhost:8081"
     ],
     methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
-    credentials: true,
+    credentials: true
   })
 );
 
@@ -30,7 +30,7 @@ const store = new MongoDbStore({
   uri: process.env.MONGODB_URL,
   databaseName: "bill_spliter",
   collection: "sessions",
-  expires: 1000 * 24 * 60 * 60, //24hr in milisecond
+  expires: 1000 * 24 * 60 * 60 //24hr in milisecond
 });
 
 //  session middleware
@@ -53,10 +53,10 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 24 * 60 * 60, // 24 hours in miliseconnds
-      secure: false,
+      secure: false
       // httpOnly: true,
       // SameSite: "None",
-    },
+    }
   })
 );
 

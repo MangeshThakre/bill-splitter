@@ -17,7 +17,7 @@ class controller {
         userId,
         {
           firstName,
-          lastName,
+          lastName
         },
         { new: true, select: { hash: 0, salt: 0 } }
       );
@@ -40,7 +40,7 @@ class controller {
       creator: req.body.creator,
       groupName: req.body.groupName,
       groupType: req.body.groupType,
-      membersArr: [{ name, email }, ...membersArr],
+      membersArr: [{ name, email }, ...membersArr]
     });
 
     try {
@@ -49,7 +49,7 @@ class controller {
     } catch (error) {
       res.json({
         error: true,
-        error: error.message,
+        error: error.message
       });
       console.log(error);
     }
@@ -68,8 +68,8 @@ class controller {
           $set: {
             membersArr,
             groupType,
-            groupName,
-          },
+            groupName
+          }
         },
         { returnOriginal: false }
       );
@@ -89,9 +89,9 @@ class controller {
         {
           $pull: {
             membersArr: {
-              email: memberEmail,
-            },
-          },
+              email: memberEmail
+            }
+          }
         },
         { returnOriginal: false }
       );
@@ -126,7 +126,7 @@ class controller {
       const result = await firendsModel.findOneAndUpdate(
         { userId, "friendsArr.email": friend.email },
         {
-          $set: { "friendsArr.$.name": friend.name },
+          $set: { "friendsArr.$.name": friend.name }
         },
         { returnOriginal: false }
       );
@@ -146,9 +146,9 @@ class controller {
         {
           $pull: {
             friendsArr: {
-              email: friendEmail,
-            },
-          },
+              email: friendEmail
+            }
+          }
         },
         { returnOriginal: false }
       );
@@ -178,8 +178,8 @@ class controller {
       const groups = await groupModel.aggregate([
         {
           $match: {
-            membersArr: { $elemMatch: { email: userEmail } },
-          },
+            membersArr: { $elemMatch: { email: userEmail } }
+          }
         },
         { $addFields: { userEmail: userEmail } },
         {
@@ -187,10 +187,10 @@ class controller {
             from: "friends",
             localField: "userEmail",
             foreignField: "email",
-            as: "friends",
-          },
+            as: "friends"
+          }
         },
-        { $unwind: "$friends" },
+        { $unwind: "$friends" }
       ]);
 
       function membersArr(membersArr, friendsArr) {
@@ -250,8 +250,8 @@ class controller {
             from: "friends",
             localField: "userIdStr",
             foreignField: "userId",
-            as: "freinds",
-          },
+            as: "freinds"
+          }
         },
         { $unwind: "$freinds" },
         {
@@ -260,8 +260,8 @@ class controller {
             from: "expenses",
             localField: "_idStr",
             foreignField: "groupId",
-            as: "expensesArr",
-          },
+            as: "expensesArr"
+          }
         },
         {
           $project: {
@@ -269,9 +269,9 @@ class controller {
             groupId: "$_id",
             membersArr: "$membersArr",
             friends: "$freinds",
-            expensesArr: "$expensesArr",
-          },
-        },
+            expensesArr: "$expensesArr"
+          }
+        }
       ]);
 
       const friends = groupMemberDetail.friends;
@@ -306,7 +306,7 @@ class controller {
             splitWithMember.forEach((e) =>
               obj["owed"].push({
                 userId: expense.paidBy,
-                amount: e.amountLeft,
+                amount: e.amountLeft
               })
             );
           } else {
@@ -316,7 +316,7 @@ class controller {
             obj["groupId"] = expense.groupId;
             obj["owe"] = {
               userId: expense.paidBy,
-              amount: splitWithMember.amountLeft,
+              amount: splitWithMember.amountLeft
             };
           }
           transection.push(obj);
@@ -362,7 +362,7 @@ class controller {
       expanseDescription,
       amount,
       paidBy,
-      splitWith,
+      splitWith
     });
 
     try {
@@ -388,19 +388,19 @@ class controller {
             from: "expenses",
             localField: "_idStr",
             foreignField: "groupId",
-            as: "expensesArr",
-          },
+            as: "expensesArr"
+          }
         },
         {
           $lookup: {
             from: "friends",
             localField: "userId",
             foreignField: "userId",
-            as: "friends",
-          },
+            as: "friends"
+          }
         },
         { $unwind: "$expensesArr" },
-        { $unwind: "$friends" },
+        { $unwind: "$friends" }
       ]);
 
       function handleMembers(groupMembers, friends, splitWith) {
@@ -417,7 +417,7 @@ class controller {
             name: memberFromFriends ? memberFromFriends.name : member.name,
             email: memberFromFriends ? memberFromFriends.email : member.email,
             amountLeft: e.amountLeft,
-            isSettled: e.isSettled,
+            isSettled: e.isSettled
           });
         });
         return membersArr;
@@ -470,10 +470,10 @@ class controller {
             from: "friends",
             localField: "userId",
             foreignField: "userId",
-            as: "friends",
-          },
+            as: "friends"
+          }
         },
-        { $unwind: "$friends" },
+        { $unwind: "$friends" }
         // { $unwind: "$friends.friendsArr" },
       ]);
       function handleMembers(groupMembers, splitWith) {
@@ -485,7 +485,7 @@ class controller {
             name: member ? member.name : e.name,
             email: member ? member.email : e.email,
             amountLeft: e.amountLeft,
-            isSettled: e.isSettled,
+            isSettled: e.isSettled
           });
         });
         return membersArr;
@@ -533,10 +533,10 @@ class controller {
       const result = await expenseModel.findOneAndUpdate(
         {
           _id: expenseId,
-          "splitWith.email": userEmail,
+          "splitWith.email": userEmail
         },
         {
-          $set: { "splitWith.$.isSettled": true },
+          $set: { "splitWith.$.isSettled": true }
         },
         { returnOriginal: false }
       );
@@ -556,8 +556,8 @@ class controller {
       const groupExpeses = await groupModel.aggregate([
         {
           $match: {
-            membersArr: { $elemMatch: { email: userEmail } },
-          },
+            membersArr: { $elemMatch: { email: userEmail } }
+          }
         },
         { $addFields: { _idStr: { $toString: "$_id" } } },
         {
@@ -565,8 +565,8 @@ class controller {
             from: "expenses",
             localField: "_idStr",
             foreignField: "groupId",
-            as: "expenses",
-          },
+            as: "expenses"
+          }
         },
         {
           $project: {
@@ -576,9 +576,9 @@ class controller {
             expenseType: "GROUP",
             groupName: "$groupName",
             expenses: "$expenses.expanseDescription",
-            amount: "$expenses.amount",
-          },
-        },
+            amount: "$expenses.amount"
+          }
+        }
       ]);
 
       const friends = await firendsModel.findOne({ userId });
@@ -586,7 +586,7 @@ class controller {
 
       const personalExpenses = await expenseModel.aggregate([
         { $match: { expenseType: "PRIVATE" } },
-        { $match: { "splitWith.email": userEmail } },
+        { $match: { "splitWith.email": userEmail } }
       ]);
 
       // pprivete expense

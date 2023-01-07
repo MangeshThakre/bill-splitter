@@ -9,7 +9,6 @@ import loading from "../../../asset/loading.svg";
 // component
 import ExpenseList from "./ExpenseList.js";
 
-import { Form } from "react-router-dom";
 function AllExpense() {
   const URL = process.env.REACT_APP_URL;
   const USER = useSelector((state) => state.global.user);
@@ -18,7 +17,7 @@ function AllExpense() {
   const [alertPopUp, setAlertPopUp] = useState({
     display: false,
     alertMessage: "",
-    type: "",
+    type: ""
   });
   function handleAlert(display, alertMessage, type) {
     setAlertPopUp({ display, alertMessage, type });
@@ -42,7 +41,7 @@ function AllExpense() {
           "/api/get_all_expenses?userEmail=" +
           USER.email +
           "&userId=" +
-          USER._id,
+          USER._id
       });
       const data = await response.data;
       setAllExpense(data);
@@ -55,8 +54,14 @@ function AllExpense() {
 
   return (
     <>
-      <div id="allExpense" className="flex-1   mx-2 shadow-xl">
-        <div id="dashbordHeader" className="w-full  bg-gray-200">
+      <div
+        id="allExpense"
+        className="flex-1   mx-2 shadow-xl  overflow-scroll pb-5"
+      >
+        <div
+          id="dashbordHeader"
+          className="w-full sticky  shadow-xl top-0   left-0  bg-gray-200 "
+        >
           {/* dashbord   heading 01*/}
           <div className="  flex justify-end h-20 items-center gap-3 px-4 mb-4">
             <h1 className="flex-1 ml-auto text-xl font-semibold ">

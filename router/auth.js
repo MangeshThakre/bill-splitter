@@ -12,7 +12,7 @@ router.get("/login/success", (req, res) => {
     res.status(200).json({
       error: false,
       message: "Successfully Loged In",
-      user: req.user,
+      user: req.user
     });
   } else {
     res.status(403).json({ error: true, message: "you are not Authenticated" });
@@ -38,7 +38,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/signin",
-    successRedirect: process.env.APP_URL,
+    successRedirect: process.env.APP_URL
   })
 );
 

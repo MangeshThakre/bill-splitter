@@ -10,9 +10,8 @@ import AddGroupPopUp from "../../popup/addGroupPopup/AddGroupPopUp";
 // listComponent
 import GroupMemberList from "./GroupMemberList.js";
 
-function RightSideBar({ currentGroup }) {
+function RightSideBar({ currentGroup, isGroupInfoLoading }) {
   const [showAddGroupPopUp, setShowGroupPopUp] = useState(false);
-
   return (
     <>
       <div className="w-80 h-full" aria-label="Sidebar">
@@ -28,18 +27,25 @@ function RightSideBar({ currentGroup }) {
           </div>
           {/* edit group button  exit*/}
 
-          <div className="">
-            <h1 className="font-bold text-gray-400 text-lg">GROUP MEMBERS</h1>
-            <ul>
-              {currentGroup.membersArr.map((e, i) => {
-                return (
-                  <li key={i}>
-                    <GroupMemberList currentMember={e} />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          {/* group members list */}
+          {!isGroupInfoLoading ? (
+            <div className="">
+              <h1 className="font-bold text-gray-400 text-lg">GROUP MEMBERS</h1>
+              <ul>
+                {currentGroup.membersArr.map((e, i) => {
+                  return (
+                    <li key={i}>
+                      <GroupMemberList currentMember={e} />
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            "loading..."
+          )}
+
+          {/* group member list end */}
         </div>
       </div>
 
