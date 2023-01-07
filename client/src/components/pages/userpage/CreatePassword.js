@@ -24,7 +24,7 @@ function CreatePassword({ handleAlert, setIsForget = "" }) {
       const response = await axios({
         method: "post",
         url: URL + "/auth/create_password",
-        data: { userId: USER._id, password },
+        data: { userId: USER._id, password }
       });
       const data = await response.data;
       dispatch(user(data));
@@ -66,11 +66,11 @@ function CreatePassword({ handleAlert, setIsForget = "" }) {
             type="text"
             id="password"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="enter password"
+            placeholder="8 character password"
             required
             autoComplete="off"
-            minLength={8}
-            maxLength={12}
+            minLength="8"
+            maxLength="8"
           />
         </div>
         <div className="mb-6">
@@ -87,8 +87,8 @@ function CreatePassword({ handleAlert, setIsForget = "" }) {
             placeholder="confirm password"
             required
             autoComplete="off"
-            minLength={8}
-            maxLength={12}
+            minLength="8"
+            maxLength="8"
           />
         </div>
         <button

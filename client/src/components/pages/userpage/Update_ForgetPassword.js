@@ -28,7 +28,7 @@ function Update_ForgetPassword({ handleAlert }) {
       const response = await axios({
         method: "post",
         url: URL + "/auth/update_password",
-        data: { password, newPassword, userId: USER._id },
+        data: { password, newPassword, userId: USER._id }
       });
       const data = await response.data;
       dispatch(user(data));
@@ -73,13 +73,13 @@ function Update_ForgetPassword({ handleAlert }) {
               </label>
               <input
                 type="text"
-                id="password "
+                id="8 character password"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="enter password"
                 required
                 autoComplete="off"
-                minLength={8}
-                maxLength={12}
+                minLength="8"
+                maxLength="8"
               />
             </div>
             <div className="mb-6">
@@ -91,13 +91,13 @@ function Update_ForgetPassword({ handleAlert }) {
               </label>
               <input
                 type="text"
-                id="new password"
+                id="8 character password"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="new password"
                 required
                 autoComplete="off"
-                minLength={8}
-                maxLength={12}
+                minLength="8"
+                maxLength="8"
               />
             </div>
             <div className="flex-0 ml-auto">

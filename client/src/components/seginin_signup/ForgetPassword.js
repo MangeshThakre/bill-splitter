@@ -41,7 +41,7 @@ function ForgetPassword({ handleAlert }) {
     try {
       const response = await axios({
         method: "get",
-        url: URL + "/auth/send_otp?userEmail=" + email,
+        url: URL + "/auth/send_otp?userEmail=" + email
       });
       const data = await response.data;
       setSErverOTP(data.otp);
@@ -76,7 +76,7 @@ function ForgetPassword({ handleAlert }) {
       const response = await axios({
         method: "post",
         url: URL + "/auth/create_password",
-        data: { userId: USER._id, password },
+        data: { userId: USER._id, password }
       });
       const data = await response.data;
       e.target[0].value = "";
@@ -201,6 +201,8 @@ function ForgetPassword({ handleAlert }) {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               placeholder="create new password"
               required
+              minLength="8"
+              maxLength="8"
             />
           </div>
           <div>
@@ -217,6 +219,7 @@ function ForgetPassword({ handleAlert }) {
               placeholder="••••••••"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               minLength="8"
+              maxLength="8"
               required
             />
           </div>
