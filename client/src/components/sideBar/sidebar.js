@@ -51,7 +51,7 @@ function Sidebar() {
     try {
       const response = await axios({
         method: "get",
-        url: URL + "/api/get_groups?userEmail=" + USER.email,
+        url: URL + "/api/get_groups?userEmail=" + USER.email
       });
       const data = await response.data.data;
       if (data) dispatch(groups(data));
@@ -67,7 +67,7 @@ function Sidebar() {
     try {
       const response = await axios({
         method: "get",
-        url: URL + "/api/get_friends?userId=" + USER._id,
+        url: URL + "/api/get_friends?userId=" + USER._id
       });
       const data = await response.data.data;
       if (data) dispatch(friends(data));
@@ -83,6 +83,7 @@ function Sidebar() {
       <aside className="w-80 h-full" aria-label="Sidebar">
         <div className="overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800 h-full pt-10">
           <ul className="space-y-2  flex   flex-col   h-full">
+            {/* all expances   */}
             <li>
               <Link
                 to="all_expenses"
@@ -103,9 +104,11 @@ function Sidebar() {
                 </span>
               </Link>
             </li>
+            {/* all expances   */}
 
-            {/* group  list */}
+            {/* group */}
             <li>
+              {/* group dropdown button */}
               <button
                 type="button"
                 onClick={() => setShowGroutList((prev) => !prev)}
@@ -133,41 +136,48 @@ function Sidebar() {
                   <img className="h-3 mr-2" src={arrowRight} alt="arrow" />
                 )}
               </button>
-              <ul
-                id="dropdown-example"
-                className={
-                  showGroupList
-                    ? "p-1 flex flex-col gap-2  rounded-md mt-1 bg-[#80808021]"
-                    : "hidden "
-                }
-              >
-                <li>
-                  <a
-                    href="#"
-                    onClick={() => setShowGroupPopUp((prev) => !prev)}
-                    className="flex items-center p-2 pl-4   gap-7 w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    <img src={addIcon} className="w-3 ml-2" alt="add" />
-                    Add Group
-                  </a>
-                </li>
+              {/* group dropdown button end */}
 
-                {isGetGropusLoading ? (
-                  <>
-                    <li>
-                      <ListSkeleton />
-                    </li>
-                    <li>
-                      <ListSkeleton />
-                    </li>
-                  </>
-                ) : (
-                  <ListWithInfo listInfo={GROUPS} type={"group"} />
-                )}
-              </ul>
+              {showGroupList ? (
+                <ul
+                  id="dropdown-example"
+                  className="p-1 flex flex-col gap-2  rounded-md mt-1 bg-[#80808021]"
+                >
+                  {/* add group dutton */}
+                  <li>
+                    <a
+                      href="#"
+                      onClick={() => setShowGroupPopUp((prev) => !prev)}
+                      className="flex items-center p-2 pl-4   gap-7 w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    >
+                      <img src={addIcon} className="w-3 ml-2" alt="add" />
+                      Add Group
+                    </a>
+                  </li>
+                  {/* add group dutton  end*/}
+
+                  {/* group list */}
+                  {isGetGropusLoading ? (
+                    <>
+                      <li>
+                        <ListSkeleton />
+                      </li>
+                      <li>
+                        <ListSkeleton />
+                      </li>
+                    </>
+                  ) : (
+                    <ListWithInfo listInfo={GROUPS} type={"group"} />
+                  )}
+                  {/* group list end */}
+                </ul>
+              ) : null}
             </li>
-            {/* Friend list */}
+            {/* group end */}
+
+            {/* Friend  */}
             <li>
+              {/* show friend list button */}
               <button
                 type="button"
                 onClick={() => setShowFriendList((prev) => !prev)}
@@ -189,44 +199,54 @@ function Sidebar() {
                 <span className="flex-1 ml-3 text-left whitespace-nowrap">
                   Friends
                 </span>
+
                 {showFriendList ? (
                   <img className="w-3 mr-2" src={arrowDown} alt="arrow" />
                 ) : (
                   <img className="h-3 mr-2" src={arrowRight} alt="arrow" />
                 )}
               </button>
-              <ul
-                id="dropdown-example"
-                className={
-                  showFriendList
-                    ? "p-1 flex flex-col gap-2 rounded-md mt-1 bg-[#80808021]"
-                    : "hidden"
-                }
-              >
-                <li>
-                  <a
-                    href="#"
-                    onClick={() => setShowAddFreindpopUp((prev) => !prev)}
-                    className="flex items-center p-2 pl-4 gap-7 w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    <img src={addIcon} className="w-3 ml-2" alt="add" />
-                    Add Firend
-                  </a>
-                </li>
-                {isGetFriendsLoading ? (
-                  <>
-                    <li>
-                      <ListSkeleton />
-                    </li>
-                    <li>
-                      <ListSkeleton />
-                    </li>
-                  </>
-                ) : (
-                  <ListWithInfo listInfo={FRIENDS} type={"friend"} />
-                )}
-              </ul>
+              {/*  show freind list button */}
+
+              {/* friend list  */}
+              {showFriendList ? (
+                <ul
+                  id="dropdown-example"
+                  className="p-1 flex flex-col gap-2 rounded-md mt-1 bg-[#80808021]"
+                >
+                  {/* add friend */}
+                  <li>
+                    <a
+                      href="#"
+                      onClick={() => setShowAddFreindpopUp((prev) => !prev)}
+                      className="flex items-center p-2 pl-4 gap-7 w-full text-base font-normal  hover:text-blue-500  text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    >
+                      <img src={addIcon} className="w-3 ml-2" alt="add" />
+                      Add Firend
+                    </a>
+                  </li>
+                  {/* add friend end */}
+
+                  {/* add friend list */}
+                  {isGetFriendsLoading ? (
+                    <>
+                      <li>
+                        <ListSkeleton />
+                      </li>
+                      <li>
+                        <ListSkeleton />
+                      </li>
+                    </>
+                  ) : (
+                    <ListWithInfo listInfo={FRIENDS} type={"friend"} />
+                  )}
+                  {/* add friend list end*/}
+                </ul>
+              ) : null}
+              {/* friend list end */}
             </li>
+            {/* friend */}
+
             {/* user */}
             <li>
               <Link
@@ -249,6 +269,8 @@ function Sidebar() {
                 <span className="flex-1 ml-3 whitespace-nowrap">User</span>
               </Link>
             </li>
+            {/* user end */}
+
             {/* log out */}
             <li className=" mt-auto flex-1 flex items-end">
               <a
@@ -274,6 +296,7 @@ function Sidebar() {
                 <span className="flex-1 ml-3 whitespace-nowrap">Log out</span>
               </a>
             </li>
+            {/* logout end */}
           </ul>
         </div>
       </aside>

@@ -14,11 +14,11 @@ const expenseSchema = new Schema(
           email: { type: String, required: true },
           name: { type: String },
           amountLeft: { type: Number, required: true },
-          isSettled: { type: Boolean, required: true },
+          isSettled: { type: Boolean, required: true }
         },
         { _id: false }
-      ),
-    ],
+      )
+    ]
   },
   { timestamps: true }
 );

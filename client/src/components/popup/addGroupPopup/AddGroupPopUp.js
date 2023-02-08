@@ -18,7 +18,7 @@ function AddGroupPopUp({
   showAddGroupPopUp,
   setShowGroupPopUp,
   isEdit = false,
-  currentGroup = [],
+  currentGroup = []
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ function AddGroupPopUp({
   const [alertPopUp, setAlertPopUp] = useState({
     display: false,
     alertMessage: "",
-    type: "",
+    type: ""
   });
 
   useEffect(() => {
@@ -65,6 +65,7 @@ function AddGroupPopUp({
     li.children[1].firstElementChild.addEventListener("input", (e) =>
       handleDropdownMemberName(e)
     );
+
     li.children[2].addEventListener("input", (event) =>
       handleEmailInput(event.target)
     );
@@ -140,7 +141,7 @@ function AddGroupPopUp({
     groupMambersNameArr.forEach((e, i) => {
       membersArr.push({
         name: e.value.trim(),
-        email: groupMemberEmailArr[i].value.trim().toLowerCase(),
+        email: groupMemberEmailArr[i].value.trim().toLowerCase()
       });
     });
     return membersArr;
@@ -276,7 +277,7 @@ function AddGroupPopUp({
           "/api/remove_group_member?groupId=" +
           currentGroup._id +
           "&memberEmail=" +
-          memberEmail,
+          memberEmail
       });
       const updatedGroup = await response.data;
       const newGroupArr = GROUPS.map((e) => {
@@ -336,7 +337,7 @@ function AddGroupPopUp({
     const creator = {
       id: USER._id,
       name: USER.firstName + " " + USER.lastName,
-      email: USER.email,
+      email: USER.email
     };
 
     setIsSaveLoading(true);
@@ -344,7 +345,7 @@ function AddGroupPopUp({
       const response = await axios({
         method: "post",
         url: URL + "/api/create_group",
-        data: { creator, groupName, membersArr, groupType },
+        data: { creator, groupName, membersArr, groupType }
       });
       const { groupResult } = await response.data;
       // add group and update griends in readux
@@ -410,8 +411,8 @@ function AddGroupPopUp({
           groupName,
           membersArr,
           groupType,
-          groupId: currentGroup._id,
-        },
+          groupId: currentGroup._id
+        }
       });
       const groupResult = await response.data;
       // add group and update griends in readux
@@ -441,7 +442,7 @@ function AddGroupPopUp({
     try {
       const deleteResponse = await axios({
         method: "delete",
-        url: URL + "/api/delete_group?groupId=" + currentGroup._id,
+        url: URL + "/api/delete_group?groupId=" + currentGroup._id
       });
       const { data } = deleteResponse.data;
       if (data === "deleted") {
@@ -588,6 +589,7 @@ function AddGroupPopUp({
                               </p>
                               <p>( {USER.email} )</p>
                             </li>
+
                             <li className="flex gap-3 items-center mt-4">
                               <img
                                 src={persionImg}
@@ -680,7 +682,7 @@ function AddGroupPopUp({
                                       backgroundColor:
                                         member.name && member.email
                                           ? "#f7be38"
-                                          : "#f9fafb",
+                                          : "#f9fafb"
                                     }}
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="email@.com (required)"
@@ -691,6 +693,8 @@ function AddGroupPopUp({
                                   {groupCreastor.email == member.email ? (
                                     <div className="w-[5rem] text-xl">🅰️</div>
                                   ) : (
+                                    <div className="w-[5rem] text-xl">😀</div>
+
                                     // <button
                                     //   type="button"
                                     //   onClick={(e) => handleRemoveMEmber(e)}
@@ -698,7 +702,6 @@ function AddGroupPopUp({
                                     // >
                                     //   x
                                     // </button>
-                                    <div className="w-[5rem] text-xl">😀</div>
                                   )}
                                 </li>
                               );

@@ -9,8 +9,7 @@ const userSchema = new Schema({
   profilePhoto: { type: String },
   hash: { type: String },
   salt: { type: String },
-  source: { type: Array },
-  created_at: { type: Date },
+  source: { type: Array }
 });
 const userModel = mongoose.model("user", userSchema);
 module.exports = userModel;

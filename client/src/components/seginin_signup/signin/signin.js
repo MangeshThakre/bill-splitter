@@ -30,8 +30,6 @@ function Signin({ handleAlert }) {
       const data = await response.data;
 
       if (!data.error) {
-        // window.location.href = "http://localhost/3000";
-        // console.log(data);
         window.location.reload();
       } else {
         handleAlert(true, data.message, "error");

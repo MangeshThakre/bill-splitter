@@ -9,11 +9,11 @@ const friendsSchema = new Schema({
     new Schema(
       {
         name: { type: String, require: true },
-        email: { type: String },
+        email: { type: String }
       },
       { _id: false }
-    ),
-  ],
+    )
+  ]
 });
 
 const firendsModel = mongoose.model("friends", friendsSchema);

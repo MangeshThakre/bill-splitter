@@ -38,7 +38,7 @@ function Signup({ handleAlert }) {
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      handleAlert(true, error.message, "error");
+      handleAlert(true, error.response.data.message, "error");
     }
   }
 

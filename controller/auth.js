@@ -1,16 +1,18 @@
 require("dotenv").config();
 const mongoose = require("../database.js");
-const userModel = require("../schema/user_schema.js");
 const { genPassword, validPassword } = require("../lib/passportLib.js");
+const userModel = require("../schema/user_schema.js");
+const firendsModel = require("../schema/friendsSchema.js");
 const md5 = require("md5");
 const nodemailer = require("nodemailer");
 
 class AuthController {
+  // sign in
   static singIn(req, res) {
     if (!req.user.error) {
       res.status(200).json({
         error: false,
-        message: "Successfully Loged In",
+        message: "Successfully Loged In"
         // user: req.user,
       });
     } else {
@@ -19,40 +21,49 @@ class AuthController {
     }
   }
 
+  // signup
   static async signUp(req, res) {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     const phoneNo = req.body.phoneNo;
     const email = req.body.email;
+
+    // create hash and salt  using genPassword funciton
     const { hash, salt } = genPassword(req.body.passWord);
 
-    const userExist = await userModel.findOne({ email });
-    if (userExist) {
-      return res.status(401).json({
-        error: true,
-        message: "already have an account " + userExist.email,
+    try {
+      /// check if user already exist or not
+      const userExist = await userModel.findOne({ email });
+      if (userExist) {
+        return res.status(401).json({
+          error: true,
+          message: "already have an account " + userExist.email
+        });
+      }
+
+      const userInfo = new userModel({
+        firstName,
+        lastName,
+        phoneNo,
+        email,
+        hash,
+        salt,
+        source: ["local"]
       });
+      const result = await userInfo.save();
+
+      /// create friends document for this user with basic detail and  friends= []
+      const friendInfo = new firendsModel({
+        name: firstName + " " + lastName,
+        email: email,
+        userId: result._id,
+        friendsArr: []
+      });
+      await friendInfo.save();
+      res.status(200).json({ error: false, data: result });
+    } catch (error) {
+      res.status(500).json({ error: true, message: error.message });
     }
-
-    const userInfo = new userModel({
-      firstName,
-      lastName,
-      phoneNo,
-      email,
-      hash,
-      salt,
-      source: ["local"],
-    });
-    const result = await userInfo.save();
-
-    const friendInfo = new firendsModel({
-      name: firstName + " " + lastName,
-      email: email,
-      userId: result._id,
-      friendsArr: [],
-    });
-    await friendInfo.save();
-    res.status(200).json({ error: false, data: result });
   }
 
   static async create_password(req, res) {
@@ -80,7 +91,7 @@ class AuthController {
     try {
       const { hash, salt } = await userModel.findById(userId, {
         hash: 1,
-        salt: 1,
+        salt: 1
       });
       // check the old password is valid or not
       const isValid = validPassword(hash, salt, password);
@@ -113,7 +124,7 @@ class AuthController {
       } else if (userExist && !userExist.source.includes("local")) {
         return res.status(401).json({
           error:
-            "you have not created password for your account and hence you will not able to update password, please try to login with google",
+            "you have not created password for your account and hence you will not able to update password, please try to login with google"
         });
       }
       const transporter = nodemailer.createTransport({
@@ -123,8 +134,8 @@ class AuthController {
         secureConnection: false,
         auth: {
           user: process.env.EMAIL_ID, // generated ethereal user
-          pass: process.env.EMAIL_PASS, // generated ethereal password
-        },
+          pass: process.env.EMAIL_PASS // generated ethereal password
+        }
       });
       // send email
       const mailOptions = {
@@ -135,7 +146,7 @@ class AuthController {
                      <p>dear <b>user<b/></p>
                      ${otp} is your bull-spliter OTP, Pleas do not shere OTP as it is confidential.
                   <br>Regards,<br>
-                  <br>chatapp Team<br>`,
+                  <br>chatapp Team<br>`
       };
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) res.status(500).json({ error: error.message });

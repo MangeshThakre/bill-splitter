@@ -7,7 +7,7 @@ const groupSchema = new Schema(
       {
         name: { type: Object, require: true },
         email: { type: String, require: true },
-        id: { type: String, require: true },
+        id: { type: String, require: true }
       },
       { _id: false }
     ),
@@ -18,11 +18,11 @@ const groupSchema = new Schema(
         {
           name: { type: Object, require: true },
           email: { type: String },
-          userId: { type: Object, require: true },
+          userId: { type: Object, require: true }
         },
         { _id: false }
-      ),
-    ],
+      )
+    ]
   },
   { timestamps: true }
 );

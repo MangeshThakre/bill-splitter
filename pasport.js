@@ -14,14 +14,14 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const customfield = {
   usernameField: "email",
   passwordField: "password",
-  passReqToCallback: true,
+  passReqToCallback: true
 };
 
 // done is a callback which take three arguments err, user, info
 // like done(err, user, info)
 // passport.authenticated("local" , callback(err, user, info))
 // by default if user is false then passport set  message = "unauthorised"
-// for the custom messages i pass error message in user argument :)
+// for the custom messages, I pass error message in user argument :)
 
 const verifyLocalStrategy = async function (req, email, password, done) {
   try {
@@ -31,7 +31,7 @@ const verifyLocalStrategy = async function (req, email, password, done) {
       return done(null, {
         error: true,
         message: `That e-mail address doesn't have an associated user account.
-           Are you sure you've registered?`,
+           Are you sure you've registered?`
       });
 
       // if user first time login with social and did not generate password and try to log in with email+password
@@ -39,7 +39,7 @@ const verifyLocalStrategy = async function (req, email, password, done) {
     } else if (user && !user.hash && !user.salt) {
       return done(null, {
         error: true,
-        message: "password does not exist please try to login with social",
+        message: "password does not exist please try to login with social"
       });
     }
 
@@ -64,7 +64,7 @@ passport.use(
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/callback",
-      scope: ["profile", "email"],
+      scope: ["profile", "email"]
     },
     async function (accessToken, refreshToken, profile, done) {
       const firstName = profile._json.given_name;
@@ -85,11 +85,9 @@ passport.use(
             );
             return done(null, updatedUser);
           }
-
           if (!user.source.includes("google")) {
             const updatedUser = await userModel.findOneAndUpdate(
               { email },
-
               { source: ["local ,google"] },
               { new: true }
             );
@@ -104,7 +102,7 @@ passport.use(
             email,
             profilePhoto,
             source,
-            created_at: new Date(),
+            created_at: new Date()
           });
           const result = await saveUserInfo.save();
 
@@ -112,7 +110,7 @@ passport.use(
             name: firstName + " " + lastName,
             email: email,
             userId: result._id,
-            friendsArr: [],
+            friendsArr: []
           });
           await friendInfo.save();
           return done(null, result);
@@ -129,7 +127,7 @@ passport.serializeUser(function (user, cb) {
   process.nextTick(function () {
     cb(null, {
       id: user.id,
-      username: user.firstName + " " + user.lastName,
+      username: user.firstName + " " + user.lastName
     });
   });
 });

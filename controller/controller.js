@@ -193,6 +193,15 @@ class controller {
         { $unwind: "$friends" }
       ]);
 
+      const groupDistinctByID = groups.reduce((acc, crr) => {
+        const isGroupAlreadyExist = acc.some(
+          (group) => group._id.toString() == crr._id.toString()
+        );
+        if (!isGroupAlreadyExist) acc.push(crr);
+        return acc;
+      }, []);
+
+      // check the member is friend
       function membersArr(membersArr, friendsArr) {
         const groupMembersArr = [];
         membersArr.forEach((member) => {
@@ -204,7 +213,7 @@ class controller {
       }
 
       const groupArr = [];
-      groups.forEach((group) => {
+      groupDistinctByID.forEach((group) => {
         const groupObj = {};
         (groupObj["_id"] = group._id),
           (groupObj["creator"] = group.creator),

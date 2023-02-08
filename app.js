@@ -53,9 +53,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 24 * 60 * 60, // 24 hours in miliseconnds
-      secure: false
-      // httpOnly: true,
-      // SameSite: "None",
+      httpOnly: true,
+      sameSite: "Lax"
     }
   })
 );
